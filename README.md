@@ -4,7 +4,7 @@
 
 ### 用法和特性
 
-![](.\img\usage.JPG)
+<img src=.\img\usage.JPG>
 
 ​	注意：-s 被动搜集，从fofa，zoomeye api查询关键字，支持fofa，zoomeye语法，需注意命令行字符转义。-t 主动扫描。-f 需要--passive,--active,--urls,--recovery区分模式。ratel运行时会把需要注意的信息记录在xxx_notice.txt中，可以通过--recovery恢复notice中的错误记录。
 
@@ -15,11 +15,11 @@ title="xxx"
 xxx.org
 ```
 
-![](.\img\output.JPG)
+<img src=.\img\output.JPG>
 
 ​	ratel从配置文件中读取fofa和zoomeye API key，如果不存在config文件则会自动生成。
 
-![](.\img\config.JPG)
+<img src=.\img\config.JPG>
 
 ​	你可以设置多个zoomeye key，如果key没有额度了会自动使用下一个key。与网络相关的三个重要参数conn_timeout连接超时、write_timeout发送超时、read_timeout读取超时。
 
@@ -59,4 +59,4 @@ xxx.org
 
 ### 声明
 
-​	本项目源代码开放，你可以自由使用和更改代码，但仅可用于**合法的、非商业**用途。在使用本项目编译后的工具进行检测时，你应确保该行为符合当地的法律法规，并且已经取得了足够的授权。**请勿对非授权目标使用。**你需自行承担使用本项目代码和工具的任何后果，本人将不承担任何法律及连带责任。
+​	本项目源代码开放，你可以自由使用和更改代码，但仅可用于**合法的、非商业**用途。在使用本项目编译后的工具进行检测时，你应确保该行为符合当地的法律法规，并且已经取得了足够的授权。**请勿对非授权目标使用**。你需自行承担使用本项目代码和工具的任何后果，本人将不承担任何法律及连带责任。
