@@ -1,0 +1,3917 @@
+{
+    "pocs": [{
+        "name": "seeyon",
+        "method": "get",
+        "path": "",
+        "rules": {
+          "body": ["/seeyon/USER-DATA/IMAGES/LOGIN/login.gif"]
+        }
+    }, {  
+        "name": "seeyon",
+        "method": "get",
+        "path": "/",
+        "rules": {
+          "body": ["/seeyon/common/"]
+        }
+    }, {  
+        "name": "Spring env",
+        "method": "get",
+        "rules": {
+          "body": ["servletContextInitParams"]
+        }
+    }, {  
+        "name": "微三云管理系统",
+        "method": "get",
+        "rules": {
+          "body": ["WSY_logo","管理系统 MANAGEMENT SYSTEM"]
+        }
+    }, {  
+        "name": "Spring env",
+        "method": "get",
+        "rules": {
+          "body": ["logback"]
+        }
+    }, {  
+        "name": "Weblogic",
+        "method": "get",
+        "rules": {
+          "body": ["Error 404--Not Found"]
+        }
+    }, {  
+        "name": "Weblogic",
+        "method": "get",
+        "rules": {
+          "body": ["Error 403--"]
+        }
+    }, {  
+        "name": "Weblogic",
+        "method": "get",
+        "rules": {
+          "body": ["/console/framework/skins/wlsconsole/images/login_WebLogic_branding.png"]
+        }
+    }, {  
+        "name": "Weblogic",
+        "method": "get",
+        "rules": {
+          "body": ["Welcome to Weblogic Application Server"]
+        }
+    }, {  
+        "name": "Weblogic",
+        "method": "get",
+        "rules": {
+          "body": ["<i>Hypertext Transfer Protocol -- HTTP/1.1</i>"]
+        }
+    }, {  
+        "name": "Sangfor SSL VPN",
+        "method": "get",
+        "rules": {
+          "body": ["/por/login_psw.csp"]
+        }
+    }, {  
+        "name": "Sangfor SSL VPN",
+        "method": "get",
+        "rules": {
+          "body": ["loginPageSP/loginPrivacy.js"]
+        }
+    }, {  
+        "name": "e-mobile",
+        "method": "get",
+        "rules": {
+          "body": ["weaver,e-mobile"]
+        }
+    }, {  
+        "name": "ecology",
+        "method": "get",
+        "rules": {
+          "header": ["ecology_JSessionid"]
+        }
+    }, {  
+        "name": "Shiro",
+        "method": "get",
+        "rules": {
+          "header": ["rememberMe="]
+        }
+    }, {  
+        "name": "Shiro",
+        "method": "get",
+        "rules": {
+          "header": ["=deleteMe"]
+        }
+    }, {  
+        "name": "Shiro",
+        "method": "get",
+        "rules": {
+          "header": ["REMEMBERME"]
+        }
+    }, {  
+        "name": "Shiro",
+        "method": "get",
+        "rules": {
+          "header": ["=DELETEME"]
+        }
+    }, {  
+        "name": "泛微云桥 e-Bridge",
+        "method": "get",
+        "rules": {
+          "body": ["wx.weaver"]
+        }
+    }, {  
+        "name": "泛微 OA",
+        "method": "get",
+        "rules": {
+          "favicon": 1578525679
+        }
+    }, {  
+        "name": "泛微云桥 e-Bridge",
+        "method": "get",
+        "rules": {
+          "body": ["e-Bridge"]
+        }
+    }, {  
+        "name": "Swagger UI",
+        "method": "get",
+        "rules": {
+          "body": ["Swagger UI"]
+        }
+    }, {  
+        "name": "Ruijie",
+        "method": "get",
+        "rules": {
+          "body": ["4008 111 000"]
+        }
+    }, {  
+        "name": "Huawei SMC",
+        "method": "get",
+        "rules": {
+          "body": ["Script/SmcScript.js?version="]
+        }
+    }, {  
+        "name": "H3C Router",
+        "method": "get",
+        "rules": {
+          "body": ["/wnm/ssl/web/frame/login.html"]
+        }
+    }, {  
+        "name": "Cisco SSLVPN",
+        "method": "get",
+        "rules": {
+          "body": ["/+CSCOE+/logon.html"]
+        }
+    }, {  
+        "name": "通达OA",
+        "method": "get",
+        "rules": {
+          "body": ["/images/tongda.ico"]
+        }
+    }, {  
+        "name": "通达OA",
+        "method": "get",
+        "rules": {
+          "body": ["Office Anywhere"]
+        }
+    }, {  
+        "name": "通达OA",
+        "method": "get",
+        "rules": {
+          "body": ["通达OA","login"]
+        }
+    }, {  
+        "name": "深信服 waf",
+        "method": "get",
+        "rules": {
+          "body": ["rsa.js", "commonFunction.js"]
+        }
+    }, {  
+        "name": "深信服 waf",
+        "method": "get",
+        "rules": {
+          "body": ["Redirect to...", "/LogInOut.php"]
+        }
+    }, {  
+        "name": "网御 vpn",
+        "method": "get",
+        "rules": {
+          "body": ["/vpn/common/js/leadsec.js", "/vpn/user/common/custom/auth_home.css"]
+        }
+    }, {  
+        "name": "启明星辰天清汉马USG防火墙",
+        "method": "get",
+        "rules": {
+          "body": ["/cgi-bin/webui?op=get_product_model"]
+        }
+    }, {  
+        "name": "蓝凌 OA",
+        "method": "get",
+        "rules": {
+          "body": ["sys/ui/extend/theme/default/style/icon.css", "sys/ui/extend/theme/default/style/profile.css"]
+        }
+    }, {  
+        "name": "深信服上网行为管理系统",
+        "method": "get",
+        "rules": {
+          "body": ["utccjfaewjb = function(str, key)"]
+        }
+    }, {  
+        "name": "深信服上网行为管理系统",
+        "method": "get",
+        "rules": {
+          "body": ["document.write(WRFWWCSFBXMIGKRKHXFJ"]
+        }
+    }, {  
+        "name": "深信服应用交付报表系统",
+        "method": "get",
+        "rules": {
+          "body": ["/reportCenter/index.php?cls_mode=cluster_mode_others"]
+        }
+    }, {  
+        "name": "群晖 NAS",
+        "method": "get",
+        "rules": {
+          "body": ["Synology","webman/"]
+        }
+    }, {  
+        "name": "金蝶云星空",
+        "method": "get",
+        "rules": {
+          "body": ["HTML5/content/themes/kdcss.min.css"]
+        }
+    }, {  
+        "name": "金蝶云星空",
+        "method": "get",
+        "rules": {
+          "body": ["/ClientBin/Kingdee.BOS.XPF.App.xap"]
+        }
+    }, {  
+        "name": "CoreMail",
+        "method": "get",
+        "rules": {
+          "body": ["coremail/common"]
+        }
+    }, {  
+        "name": "启明星辰天清汉马USG防火墙",
+        "method": "get",
+        "rules": {
+          "body": ["天清汉马USG"]
+        }
+    }, {  
+        "name": "Jboss",
+        "method": "get",
+        "rules": {
+          "body": ["jboss.css"]
+        }
+    }, {  
+        "name": "Gitlab",
+        "method": "get",
+        "rules": {
+          "body": ["assets/gitlab_logo"]
+        }
+    }, {  
+        "name": "宝塔-BT.cn",
+        "method": "get",
+        "rules": {
+          "body": ["入口校验失败"]
+        }
+    }, {  
+        "name": "宝塔-BT.cn",
+        "method": "get",
+        "rules": {
+          "body": ["没有找到站点","可能原因","CDN产品","Web服务","检查端口是否正确"]
+        }
+    }, {  
+        "name": "宝塔-BT.cn",
+        "method": "get",
+        "rules": {
+          "body": ["<title>恭喜，站点创建成功","面板系统后台","系统自动生成"]
+        }
+    }, {  
+        "name": "DouPHP",
+        "method": "get",
+        "rules": {
+          "body": ["Powered by DouPHP","DouPHP","theme"]
+        }
+    }, {  
+        "name": "宝塔-BT.cn",
+        "method": "get",
+        "rules": {
+          "body": ["扫码登录更安全","bt.cn","/login"]
+        }
+    }, {  
+        "name": "宝塔-BT.cn",
+        "method": "get",
+        "rules": {
+          "body": ["站点创建成功","bt.cn"]
+        }
+    }, {  
+        "name": "宝塔-BT.cn",
+        "method": "get",
+        "rules": {
+          "body": ["站点创建成功","宝塔"]
+        }
+    }, {  
+        "name": "禅道",
+        "method": "get",
+        "rules": {
+          "body": ["self.location", "Lw=="]
+        }
+    }, {  
+        "name": "禅道",
+        "method": "get",
+        "rules": {
+          "body": ["/theme/default/images/main/zt-logo.png"]
+        }
+    }, {  
+        "name": "禅道",
+        "method": "get",
+        "rules": {
+          "header": ["zentaosid"]
+        }
+    }, {  
+        "name": "用友软件",
+        "method": "get",
+        "rules": {
+          "body": ["UFIDA Software CO.LTD all rights reserved"]
+        }
+    }, {  
+        "name": "用友NC",
+        "method": "get",
+        "rules": {
+          "body": ["logo/images/ufida_nc.png","用友NC"]
+        }
+    }, {  
+        "name": "YONYOU NC",
+        "method": "get",
+        "rules": {
+          "body": ["uclient.yonyou.com", "UClient"]
+        }
+    }, {  
+        "name": "宝塔-BT.cn",
+        "method": "get",
+        "rules": {
+          "body": ["宝塔Linux面板"]
+        }
+    }, {  
+        "name": "RabbitMQ",
+        "method": "get",
+        "rules": {
+          "body": ["<title>RabbitMQ Management</title>"]
+        }
+    }, {  
+        "name": "Zabbix",
+        "method": "get",
+        "rules": {
+          "body": ["zabbix", "Zabbix SIA"]
+        }
+    }, {  
+        "name": "联软准入",
+        "method": "get",
+        "rules": {
+          "body": ["网络准入", "leagsoft", "redirect"]
+        }
+    }, {  
+        "name": "列目录",
+        "method": "get",
+        "rules": {
+          "body": ["Index of /"]
+        }
+    }, {  
+        "name": "列目录",
+        "method": "get",
+        "rules": {
+          "body": [" - /</title>"]
+        }
+    }, {  
+        "name": "浪潮服务器IPMI管理口",
+        "method": "get",
+        "rules": {
+          "body": ["img/inspur_logo.png", "Management System"]
+        }
+    }, {  
+        "name": "RegentApi_v2.0",
+        "method": "get",
+        "rules": {
+          "body": ["RegentApi_v2.0"]
+        }
+    }, {  
+        "name": "Tomcat默认页面",
+        "method": "get",
+        "rules": {
+          "body": ["/manager/status", "/manager/html"]
+        }
+    }, {  
+        "name": "slack-instance",
+        "method": "get",
+        "rules": {
+          "favicon": 99395752
+        }
+    }, {  
+        "name": "spring-boot",
+        "method": "get",
+        "rules": {
+          "favicon": 116323821
+        }
+    }, {  
+        "name": "Jenkins",
+        "method": "get",
+        "rules": {
+          "favicon": 81586312
+        }
+    }, {  
+        "name": "Cnservers LLC",
+        "method": "get",
+        "rules": {
+          "favicon": -235701012
+        }
+    }, {  
+        "name": "Atlassian",
+        "method": "get",
+        "rules": {
+          "favicon": 743365239
+        }
+    }, {  
+        "name": "Chainpoint",
+        "method": "get",
+        "rules": {
+          "favicon": 2128230701
+        }
+    }, {  
+        "name": "LaCie",
+        "method": "get",
+        "rules": {
+          "favicon": -1277814690
+        }
+    }, {  
+        "name": "Parse",
+        "method": "get",
+        "rules": {
+          "favicon": 246145559
+        }
+    }, {  
+        "name": "Atlassian",
+        "method": "get",
+        "rules": {
+          "favicon": 628535358
+        }
+    }, {  
+        "name": "JIRA",
+        "method": "get",
+        "rules": {
+          "favicon": 855273746
+        }
+    }, {  
+        "name": "Avigilon",
+        "method": "get",
+        "rules": {
+          "favicon": 1318124267
+        }
+    }, {  
+        "name": "Atlassian – Confluence",
+        "method": "get",
+        "rules": {
+          "favicon": -305179312
+        }
+    }, {  
+        "name": "OpenStack",
+        "method": "get",
+        "rules": {
+          "favicon": 786533217
+        }
+    }, {  
+        "name": "Pi Star",
+        "method": "get",
+        "rules": {
+          "favicon": 432733105
+        }
+    }, {  
+        "name": "Atlassian",
+        "method": "get",
+        "rules": {
+          "favicon": 705143395
+        }
+    }, {  
+        "name": "Angular IO (AngularJS)",
+        "method": "get",
+        "rules": {
+          "favicon": -1255347784
+        }
+    }, {  
+        "name": "XAMPP",
+        "method": "get",
+        "rules": {
+          "favicon": -1275226814
+        }
+    }, {  
+        "name": "React",
+        "method": "get",
+        "rules": {
+          "favicon": -2009722838
+        }
+    }, {  
+        "name": "Atlassian – JIRA",
+        "method": "get",
+        "rules": {
+          "favicon": 981867722
+        }
+    }, {  
+        "name": "OpenStack",
+        "method": "get",
+        "rules": {
+          "favicon": -923088984
+        }
+    }, {  
+        "name": "Aplikasi",
+        "method": "get",
+        "rules": {
+          "favicon": 494866796
+        }
+    }, {  
+        "name": "Ubiquiti Aircube",
+        "method": "get",
+        "rules": {
+          "favicon": 1249285083
+        }
+    }, {  
+        "name": "Atlassian – Bamboo",
+        "method": "get",
+        "rules": {
+          "favicon": -1379982221
+        }
+    }, {  
+        "name": "Exostar – Managed Access Gateway",
+        "method": "get",
+        "rules": {
+          "favicon": 420473080
+        }
+    }, {  
+        "name": "Atlassian – Confluence",
+        "method": "get",
+        "rules": {
+          "favicon": -1642532491
+        }
+    }, {  
+        "name": "Cisco Meraki",
+        "method": "get",
+        "rules": {
+          "favicon": 163842882
+        }
+    }, {  
+        "name": "Archivematica",
+        "method": "get",
+        "rules": {
+          "favicon": -1378182799
+        }
+    }, {  
+        "name": "TCN",
+        "method": "get",
+        "rules": {
+          "favicon": -702384832
+        }
+    }, {  
+        "name": "CX",
+        "method": "get",
+        "rules": {
+          "favicon": -532394952
+        }
+    }, {  
+        "name": "Ace",
+        "method": "get",
+        "rules": {
+          "favicon": -183163807
+        }
+    }, {  
+        "name": "Atlassian – JIRA",
+        "method": "get",
+        "rules": {
+          "favicon": 552727997
+        }
+    }, {  
+        "name": "NetData",
+        "method": "get",
+        "rules": {
+          "favicon": 1302486561
+        }
+    }, {  
+        "name": "OpenGeo Suite",
+        "method": "get",
+        "rules": {
+          "favicon": -609520537
+        }
+    }, {  
+        "name": "Dgraph Ratel",
+        "method": "get",
+        "rules": {
+          "favicon": -1961046099
+        }
+    }, {  
+        "name": "Atlassian – JIRA",
+        "method": "get",
+        "rules": {
+          "favicon": -1581907337
+        }
+    }, {  
+        "name": "Material Dashboard",
+        "method": "get",
+        "rules": {
+          "favicon": 1913538826
+        }
+    }, {  
+        "name": "Form.io",
+        "method": "get",
+        "rules": {
+          "favicon": 1319699698
+        }
+    }, {  
+        "name": "Kubeflow",
+        "method": "get",
+        "rules": {
+          "favicon": -1203021870
+        }
+    }, {  
+        "name": "netdata dashboard",
+        "method": "get",
+        "rules": {
+          "favicon": -182423204
+        }
+    }, {  
+        "name": "CapRover",
+        "method": "get",
+        "rules": {
+          "favicon": 988422585
+        }
+    }, {  
+        "name": "WiJungle",
+        "method": "get",
+        "rules": {
+          "favicon": 2113497004
+        }
+    }, {  
+        "name": "Onera",
+        "method": "get",
+        "rules": {
+          "favicon": 1234311970
+        }
+    }, {  
+        "name": "SmartPing",
+        "method": "get",
+        "rules": {
+          "favicon": 430582574
+        }
+    }, {  
+        "name": "OpenStack",
+        "method": "get",
+        "rules": {
+          "favicon": 1232596212
+        }
+    }, {  
+        "name": "netdata dashboard",
+        "method": "get",
+        "rules": {
+          "favicon": 1585145626
+        }
+    }, {  
+        "name": "FRITZ!Box",
+        "method": "get",
+        "rules": {
+          "favicon": -219752612
+        }
+    }, {  
+        "name": "fortinet-forticlient",
+        "method": "get",
+        "rules": {
+          "favicon": 945408572
+        }
+    }, {  
+        "name": "Ubiquiti – AirOS",
+        "method": "get",
+        "rules": {
+          "favicon": -697231354
+        }
+    }, {  
+        "name": "Fortinet – Forticlient",
+        "method": "get",
+        "rules": {
+          "favicon": 945408572
+        }
+    }, {  
+        "name": "Outlook Web Application",
+        "method": "get",
+        "rules": {
+          "favicon": 1768726119
+        }
+    }, {  
+        "name": "Huawei – Claro",
+        "method": "get",
+        "rules": {
+          "favicon": 2109473187
+        }
+    }, {  
+        "name": "ASUS AiCloud",
+        "method": "get",
+        "rules": {
+          "favicon": 552592949
+        }
+    }, {  
+        "name": "SonicWALL",
+        "method": "get",
+        "rules": {
+          "favicon": 631108382
+        }
+    }, {  
+        "name": "Google",
+        "method": "get",
+        "rules": {
+          "favicon": 708578229
+        }
+    }, {  
+        "name": "Plesk",
+        "method": "get",
+        "rules": {
+          "favicon": -134375033
+        }
+    }, {  
+        "name": "Dahua Storm (IP Camera)",
+        "method": "get",
+        "rules": {
+          "favicon": 2019488876
+        }
+    }, {  
+        "name": "Huawei – ADSL/Router",
+        "method": "get",
+        "rules": {
+          "favicon": -1395400951
+        }
+    }, {  
+        "name": "Sophos Cyberoam (appliance)",
+        "method": "get",
+        "rules": {
+          "favicon": 1601194732
+        }
+    }, {  
+        "name": "LANCOM Systems",
+        "method": "get",
+        "rules": {
+          "favicon": -325082670
+        }
+    }, {  
+        "name": "Plesk",
+        "method": "get",
+        "rules": {
+          "favicon": -1050786453
+        }
+    }, {  
+        "name": "TilginAB (HomeGateway)",
+        "method": "get",
+        "rules": {
+          "favicon": -1346447358
+        }
+    }, {  
+        "name": "Supermicro Intelligent Management (IPMI)",
+        "method": "get",
+        "rules": {
+          "favicon": 1410610129
+        }
+    }, {  
+        "name": "Zyxel ZyWALL",
+        "method": "get",
+        "rules": {
+          "favicon": -440644339
+        }
+    }, {  
+        "name": "Dell SonicWALL",
+        "method": "get",
+        "rules": {
+          "favicon": 363324987
+        }
+    }, {  
+        "name": "Ubiquiti Login Portals",
+        "method": "get",
+        "rules": {
+          "favicon": -1446794564
+        }
+    }, {  
+        "name": "Sophos User Portal/VPN Portal",
+        "method": "get",
+        "rules": {
+          "favicon": 1045696447
+        }
+    }, {  
+        "name": "Apache Tomcat",
+        "method": "get",
+        "rules": {
+          "favicon": -297069493
+        }
+    }, {  
+        "name": "OpenVPN",
+        "method": "get",
+        "rules": {
+          "favicon": 396533629
+        }
+    }, {  
+        "name": "Cyberoam",
+        "method": "get",
+        "rules": {
+          "favicon": 1462981117
+        }
+    }, {  
+        "name": "ASP.net favicon",
+        "method": "get",
+        "rules": {
+          "favicon": 1772087922
+        }
+    }, {  
+        "name": "Technicolor",
+        "method": "get",
+        "rules": {
+          "favicon": 1594377337
+        }
+    }, {  
+        "name": "Vodafone (Technicolor)",
+        "method": "get",
+        "rules": {
+          "favicon": 165976831
+        }
+    }, {  
+        "name": "UBNT Router UI",
+        "method": "get",
+        "rules": {
+          "favicon": -1677255344
+        }
+    }, {  
+        "name": "Intelbras Wireless",
+        "method": "get",
+        "rules": {
+          "favicon": -359621743
+        }
+    }, {  
+        "name": "Kerio Connect (Webmail)",
+        "method": "get",
+        "rules": {
+          "favicon": -677167908
+        }
+    }, {  
+        "name": "BIG-IP",
+        "method": "get",
+        "rules": {
+          "favicon": 878647854
+        }
+    }, {  
+        "name": "Microsoft OWA",
+        "method": "get",
+        "rules": {
+          "favicon": 442749392
+        }
+    }, {  
+        "name": "pfSense",
+        "method": "get",
+        "rules": {
+          "favicon": 1405460984
+        }
+    }, {  
+        "name": "iKuai Networks",
+        "method": "get",
+        "rules": {
+          "favicon": -271448102
+        }
+    }, {  
+        "name": "Dlink Webcam",
+        "method": "get",
+        "rules": {
+          "favicon": 31972968
+        }
+    }, {  
+        "name": "3CX Phone System",
+        "method": "get",
+        "rules": {
+          "favicon": 970132176
+        }
+    }, {  
+        "name": "Bluehost",
+        "method": "get",
+        "rules": {
+          "favicon": -1119613926
+        }
+    }, {  
+        "name": "Sangfor",
+        "method": "get",
+        "rules": {
+          "favicon": 123821839
+        }
+    }, {  
+        "name": "ZTE Corporation (Gateway/Appliance)",
+        "method": "get",
+        "rules": {
+          "favicon": 459900502
+        }
+    }, {  
+        "name": "Ruckus Wireless",
+        "method": "get",
+        "rules": {
+          "favicon": -2069844696
+        }
+    }, {  
+        "name": "Bitnami",
+        "method": "get",
+        "rules": {
+          "favicon": -1607644090
+        }
+    }, {  
+        "name": "Juniper Device Manager",
+        "method": "get",
+        "rules": {
+          "favicon": 2141724739
+        }
+    }, {  
+        "name": "Technicolor Gateway",
+        "method": "get",
+        "rules": {
+          "favicon": 1835479497
+        }
+    }, {  
+        "name": "Gitlab",
+        "method": "get",
+        "rules": {
+          "favicon": 1278323681
+        }
+    }, {  
+        "name": "NETASQ - Secure / Stormshield",
+        "method": "get",
+        "rules": {
+          "favicon": -1929912510
+        }
+    }, {  
+        "name": "VMware Horizon",
+        "method": "get",
+        "rules": {
+          "favicon": -1255992602
+        }
+    }, {  
+        "name": "VMware Horizon",
+        "method": "get",
+        "rules": {
+          "favicon": 1895360511
+        }
+    }, {  
+        "name": "VMware Horizon",
+        "method": "get",
+        "rules": {
+          "favicon": -991123252
+        }
+    }, {  
+        "name": "Vmware Secure File Transfer",
+        "method": "get",
+        "rules": {
+          "favicon": 1642701741
+        }
+    }, {  
+        "name": "SAP Netweaver",
+        "method": "get",
+        "rules": {
+          "favicon": -266008933
+        }
+    }, {  
+        "name": "SAP ID Service: Log On",
+        "method": "get",
+        "rules": {
+          "favicon": -1967743928
+        }
+    }, {  
+        "name": "SAP Conversational AI",
+        "method": "get",
+        "rules": {
+          "favicon": 1347937389
+        }
+    }, {  
+        "name": "Palo Alto Login Portal",
+        "method": "get",
+        "rules": {
+          "favicon": 602431586
+        }
+    }, {  
+        "name": "Palo Alto Networks",
+        "method": "get",
+        "rules": {
+          "favicon": -318947884
+        }
+    }, {  
+        "name": "Outlook Web Application",
+        "method": "get",
+        "rules": {
+          "favicon": 1356662359
+        }
+    }, {  
+        "name": "Webmin",
+        "method": "get",
+        "rules": {
+          "favicon": 1453890729
+        }
+    }, {  
+        "name": "Docker",
+        "method": "get",
+        "rules": {
+          "favicon": -1814887000
+        }
+    }, {  
+        "name": "Docker",
+        "method": "get",
+        "rules": {
+          "favicon": 1937209448
+        }
+    }, {  
+        "name": "Amazon",
+        "method": "get",
+        "rules": {
+          "favicon": -1544605732
+        }
+    }, {  
+        "name": "Amazon",
+        "method": "get",
+        "rules": {
+          "favicon": 716989053
+        }
+    }, {  
+        "name": "phpMyAdmin",
+        "method": "get",
+        "rules": {
+          "favicon": -1010568750
+        }
+    }, {  
+        "name": "Zhejiang Uniview Technologies Co.",
+        "method": "get",
+        "rules": {
+          "favicon": -1240222446
+        }
+    }, {  
+        "name": "ISP Manager",
+        "method": "get",
+        "rules": {
+          "favicon": -986678507
+        }
+    }, {  
+        "name": "AXIS (network cameras)",
+        "method": "get",
+        "rules": {
+          "favicon": -1616143106
+        }
+    }, {  
+        "name": "Roundcube Webmail",
+        "method": "get",
+        "rules": {
+          "favicon": -976235259
+        }
+    }, {  
+        "name": "UniFi Video Controller (airVision)",
+        "method": "get",
+        "rules": {
+          "favicon": 768816037
+        }
+    }, {  
+        "name": "pfSense",
+        "method": "get",
+        "rules": {
+          "favicon": 1015545776
+        }
+    }, {  
+        "name": "Freebox OS",
+        "method": "get",
+        "rules": {
+          "favicon": 1838417872
+        }
+    }, {  
+        "name": "Keenetic",
+        "method": "get",
+        "rules": {
+          "favicon": 547282364
+        }
+    }, {  
+        "name": "Sierra Wireless Ace Manager (Airlink)",
+        "method": "get",
+        "rules": {
+          "favicon": -1571472432
+        }
+    }, {  
+        "name": "Synology DiskStation",
+        "method": "get",
+        "rules": {
+          "favicon": 149371702
+        }
+    }, {  
+        "name": "INSTAR IP Cameras",
+        "method": "get",
+        "rules": {
+          "favicon": -1169314298
+        }
+    }, {  
+        "name": "Webmin",
+        "method": "get",
+        "rules": {
+          "favicon": -1038557304
+        }
+    }, {  
+        "name": "Octoprint (3D printer)",
+        "method": "get",
+        "rules": {
+          "favicon": 1307375944
+        }
+    }, {  
+        "name": "Webmin",
+        "method": "get",
+        "rules": {
+          "favicon": 1280907310
+        }
+    }, {  
+        "name": "Vesta Hosting Control Panel",
+        "method": "get",
+        "rules": {
+          "favicon": 1954835352
+        }
+    }, {  
+        "name": "Farming Simulator Dedicated Server",
+        "method": "get",
+        "rules": {
+          "favicon": 509789953
+        }
+    }, {  
+        "name": "Residential Gateway",
+        "method": "get",
+        "rules": {
+          "favicon": -1933493443
+        }
+    }, {  
+        "name": "cPanel Login",
+        "method": "get",
+        "rules": {
+          "favicon": 1993518473
+        }
+    }, {  
+        "name": "Arris",
+        "method": "get",
+        "rules": {
+          "favicon": -1477563858
+        }
+    }, {  
+        "name": "PLEX Server",
+        "method": "get",
+        "rules": {
+          "favicon": -895890586
+        }
+    }, {  
+        "name": "Dlink Webcam",
+        "method": "get",
+        "rules": {
+          "favicon": -1354933624
+        }
+    }, {  
+        "name": "Deluge",
+        "method": "get",
+        "rules": {
+          "favicon": 944969688
+        }
+    }, {  
+        "name": "Webmin",
+        "method": "get",
+        "rules": {
+          "favicon": 479413330
+        }
+    }, {  
+        "name": "Cambium Networks",
+        "method": "get",
+        "rules": {
+          "favicon": -435817905
+        }
+    }, {  
+        "name": "Plesk",
+        "method": "get",
+        "rules": {
+          "favicon": -981606721
+        }
+    }, {  
+        "name": "Dahua Storm (IP Camera)",
+        "method": "get",
+        "rules": {
+          "favicon": 833190513
+        }
+    }, {  
+        "name": "Parallels Plesk Panel",
+        "method": "get",
+        "rules": {
+          "favicon": -652508439
+        }
+    }, {  
+        "name": "Fireware Watchguard",
+        "method": "get",
+        "rules": {
+          "favicon": -569941107
+        }
+    }, {  
+        "name": "Shock&Innovation!! netis setup",
+        "method": "get",
+        "rules": {
+          "favicon": 1326164945
+        }
+    }, {  
+        "name": "cacaoweb",
+        "method": "get",
+        "rules": {
+          "favicon": -1738184811
+        }
+    }, {  
+        "name": "Loxone (Automation)",
+        "method": "get",
+        "rules": {
+          "favicon": 904434662
+        }
+    }, {  
+        "name": "HP Printer / Server",
+        "method": "get",
+        "rules": {
+          "favicon": 905744673
+        }
+    }, {  
+        "name": "Netflix",
+        "method": "get",
+        "rules": {
+          "favicon": 902521196
+        }
+    }, {  
+        "name": "Linksys Smart Wi-Fi",
+        "method": "get",
+        "rules": {
+          "favicon": -2063036701
+        }
+    }, {  
+        "name": "lwIP (A Lightweight TCP/IP stack)",
+        "method": "get",
+        "rules": {
+          "favicon": -1205024243
+        }
+    }, {  
+        "name": "Hitron Technologies",
+        "method": "get",
+        "rules": {
+          "favicon": 607846949
+        }
+    }, {  
+        "name": "Dahua Storm (DVR)",
+        "method": "get",
+        "rules": {
+          "favicon": 1281253102
+        }
+    }, {  
+        "name": "MOBOTIX Camera",
+        "method": "get",
+        "rules": {
+          "favicon": 661332347
+        }
+    }, {  
+        "name": "Blue Iris (Webcam)",
+        "method": "get",
+        "rules": {
+          "favicon": -520888198
+        }
+    }, {  
+        "name": "Vigor Router",
+        "method": "get",
+        "rules": {
+          "favicon": 104189364
+        }
+    }, {  
+        "name": "Alibaba Cloud (Block Page)",
+        "method": "get",
+        "rules": {
+          "favicon": 1227052603
+        }
+    }, {  
+        "name": "DD WRT (DD-WRT milli_httpd)",
+        "method": "get",
+        "rules": {
+          "favicon": 252728887
+        }
+    }, {  
+        "name": "Mitel Networks (MiCollab End User Portal)",
+        "method": "get",
+        "rules": {
+          "favicon": -1922044295
+        }
+    }, {  
+        "name": "Dlink Webcam",
+        "method": "get",
+        "rules": {
+          "favicon": 1221759509
+        }
+    }, {  
+        "name": "Dlink Router",
+        "method": "get",
+        "rules": {
+          "favicon": 1037387972
+        }
+    }, {  
+        "name": "PRTG Network Monitor",
+        "method": "get",
+        "rules": {
+          "favicon": -655683626
+        }
+    }, {  
+        "name": "Elastic (Database)",
+        "method": "get",
+        "rules": {
+          "favicon": 1611729805
+        }
+    }, {  
+        "name": "Dlink Webcam",
+        "method": "get",
+        "rules": {
+          "favicon": 1144925962
+        }
+    }, {  
+        "name": "Wildfly",
+        "method": "get",
+        "rules": {
+          "favicon": -1666561833
+        }
+    }, {  
+        "name": "Cisco Meraki Dashboard",
+        "method": "get",
+        "rules": {
+          "favicon": 804949239
+        }
+    }, {  
+        "name": "Workday",
+        "method": "get",
+        "rules": {
+          "favicon": -459291760
+        }
+    }, {  
+        "name": "JustHost",
+        "method": "get",
+        "rules": {
+          "favicon": 1734609466
+        }
+    }, {  
+        "name": "Baidu (IP error page)",
+        "method": "get",
+        "rules": {
+          "favicon": -1507567067
+        }
+    }, {  
+        "name": "Intelbras SA",
+        "method": "get",
+        "rules": {
+          "favicon": 2006716043
+        }
+    }, {  
+        "name": "Yii PHP Framework (Default Favicon)",
+        "method": "get",
+        "rules": {
+          "favicon": -1298108480
+        }
+    }, {  
+        "name": "truVision NVR (interlogix)",
+        "method": "get",
+        "rules": {
+          "favicon": 1782271534
+        }
+    }, {  
+        "name": "Redmine",
+        "method": "get",
+        "rules": {
+          "favicon": 603314
+        }
+    }, {  
+        "name": "phpMyAdmin",
+        "method": "get",
+        "rules": {
+          "favicon": -476231906
+        }
+    }, {  
+        "name": "Cisco (eg:Conference Room Login Page)",
+        "method": "get",
+        "rules": {
+          "favicon": -646322113
+        }
+    }, {  
+        "name": "Jetty 404",
+        "method": "get",
+        "rules": {
+          "favicon": -629047854
+        }
+    }, {  
+        "name": "Luma Surveillance",
+        "method": "get",
+        "rules": {
+          "favicon": -1351901211
+        }
+    }, {  
+        "name": "Parallels Plesk Panel",
+        "method": "get",
+        "rules": {
+          "favicon": -519765377
+        }
+    }, {  
+        "name": "HP Printer / Server",
+        "method": "get",
+        "rules": {
+          "favicon": -2144363468
+        }
+    }, {  
+        "name": "Metasploit",
+        "method": "get",
+        "rules": {
+          "favicon": -127886975
+        }
+    }, {  
+        "name": "Metasploit",
+        "method": "get",
+        "rules": {
+          "favicon": 1139788073
+        }
+    }, {  
+        "name": "Metasploit",
+        "method": "get",
+        "rules": {
+          "favicon": -1235192469
+        }
+    }, {  
+        "name": "ALIBI NVR",
+        "method": "get",
+        "rules": {
+          "favicon": 1876585825
+        }
+    }, {  
+        "name": "Sangfor",
+        "method": "get",
+        "rules": {
+          "favicon": -1810847295
+        }
+    }, {  
+        "name": "Websockets test page (eg: port 5900)",
+        "method": "get",
+        "rules": {
+          "favicon": -291579889
+        }
+    }, {  
+        "name": "macOS Server (Apple)",
+        "method": "get",
+        "rules": {
+          "favicon": 1629518721
+        }
+    }, {  
+        "name": "OpenRG",
+        "method": "get",
+        "rules": {
+          "favicon": -986816620
+        }
+    }, {  
+        "name": "Cisco Router",
+        "method": "get",
+        "rules": {
+          "favicon": -299287097
+        }
+    }, {  
+        "name": "Sangfor",
+        "method": "get",
+        "rules": {
+          "favicon": -1926484046
+        }
+    }, {  
+        "name": "HeroSpeed Digital Technology Co. (NVR/IPC/XVR)",
+        "method": "get",
+        "rules": {
+          "favicon": -873627015
+        }
+    }, {  
+        "name": "Nomadix Access Gateway",
+        "method": "get",
+        "rules": {
+          "favicon": 2071993228
+        }
+    }, {  
+        "name": "Gitlab",
+        "method": "get",
+        "rules": {
+          "favicon": 516963061
+        }
+    }, {  
+        "name": "Magento",
+        "method": "get",
+        "rules": {
+          "favicon": -38580010
+        }
+    }, {  
+        "name": "MK-AUTH",
+        "method": "get",
+        "rules": {
+          "favicon": 1490343308
+        }
+    }, {  
+        "name": "Shoutcast Server",
+        "method": "get",
+        "rules": {
+          "favicon": -632583950
+        }
+    }, {  
+        "name": "FireEye",
+        "method": "get",
+        "rules": {
+          "favicon": 95271369
+        }
+    }, {  
+        "name": "FireEye",
+        "method": "get",
+        "rules": {
+          "favicon": 1476335317
+        }
+    }, {  
+        "name": "FireEye",
+        "method": "get",
+        "rules": {
+          "favicon": -842192932
+        }
+    }, {  
+        "name": "FireEye",
+        "method": "get",
+        "rules": {
+          "favicon": 105083909
+        }
+    }, {  
+        "name": "FireEye",
+        "method": "get",
+        "rules": {
+          "favicon": 240606739
+        }
+    }, {  
+        "name": "FireEye",
+        "method": "get",
+        "rules": {
+          "favicon": 2121539357
+        }
+    }, {  
+        "name": "Adobe Campaign Classic",
+        "method": "get",
+        "rules": {
+          "favicon": -333791179
+        }
+    }, {  
+        "name": "XAMPP",
+        "method": "get",
+        "rules": {
+          "favicon": -1437701105
+        }
+    }, {  
+        "name": "Niagara Web Server",
+        "method": "get",
+        "rules": {
+          "favicon": -676077969
+        }
+    }, {  
+        "name": "Technicolor",
+        "method": "get",
+        "rules": {
+          "favicon": -2138771289
+        }
+    }, {  
+        "name": "Hitron Technologies Inc.",
+        "method": "get",
+        "rules": {
+          "favicon": 711742418
+        }
+    }, {  
+        "name": "IBM Notes",
+        "method": "get",
+        "rules": {
+          "favicon": 728788645
+        }
+    }, {  
+        "name": "Barracuda",
+        "method": "get",
+        "rules": {
+          "favicon": 1436966696
+        }
+    }, {  
+        "name": "ServiceNow",
+        "method": "get",
+        "rules": {
+          "favicon": 86919334
+        }
+    }, {  
+        "name": "Openfire Admin Console",
+        "method": "get",
+        "rules": {
+          "favicon": 1211608009
+        }
+    }, {  
+        "name": "HP iLO",
+        "method": "get",
+        "rules": {
+          "favicon": 2059618623
+        }
+    }, {  
+        "name": "Sunny WebBox",
+        "method": "get",
+        "rules": {
+          "favicon": 1975413433
+        }
+    }, {  
+        "name": "ZyXEL",
+        "method": "get",
+        "rules": {
+          "favicon": 943925975
+        }
+    }, {  
+        "name": "Huawei",
+        "method": "get",
+        "rules": {
+          "favicon": 281559989
+        }
+    }, {  
+        "name": "Tenda Web Master",
+        "method": "get",
+        "rules": {
+          "favicon": -2145085239
+        }
+    }, {  
+        "name": "Prometheus Time Series Collection and Processing Server",
+        "method": "get",
+        "rules": {
+          "favicon": -1399433489
+        }
+    }, {  
+        "name": "wdCP 云主机面板",
+        "method": "get",
+        "rules": {
+          "favicon": 1786752597
+        }
+    }, {  
+        "name": "Domoticz (Home Automation)",
+        "method": "get",
+        "rules": {
+          "favicon": 90680708
+        }
+    }, {  
+        "name": "Tableau",
+        "method": "get",
+        "rules": {
+          "favicon": -1441956789
+        }
+    }, {  
+        "name": "openWRT Luci",
+        "method": "get",
+        "rules": {
+          "favicon": -675839242
+        }
+    }, {  
+        "name": "Ubiquiti – AirOS",
+        "method": "get",
+        "rules": {
+          "favicon": 1020814938
+        }
+    }, {  
+        "name": "MDaemon Webmail",
+        "method": "get",
+        "rules": {
+          "favicon": -766957661
+        }
+    }, {  
+        "name": "Teltonika",
+        "method": "get",
+        "rules": {
+          "favicon": 119741608
+        }
+    }, {  
+        "name": "Entrolink",
+        "method": "get",
+        "rules": {
+          "favicon": 1973665246
+        }
+    }, {  
+        "name": "WindRiver-WebServer",
+        "method": "get",
+        "rules": {
+          "favicon": 74935566
+        }
+    }, {  
+        "name": "Microhard Systems",
+        "method": "get",
+        "rules": {
+          "favicon": -1723752240
+        }
+    }, {  
+        "name": "Skype",
+        "method": "get",
+        "rules": {
+          "favicon": -1807411396
+        }
+    }, {  
+        "name": "Teltonika",
+        "method": "get",
+        "rules": {
+          "favicon": -1612496354
+        }
+    }, {  
+        "name": "Eltex (Router)",
+        "method": "get",
+        "rules": {
+          "favicon": 1877797890
+        }
+    }, {  
+        "name": "bintec elmeg",
+        "method": "get",
+        "rules": {
+          "favicon": -375623619
+        }
+    }, {  
+        "name": "SyncThru Web Service (Printers)",
+        "method": "get",
+        "rules": {
+          "favicon": 1483097076
+        }
+    }, {  
+        "name": "BoaServer",
+        "method": "get",
+        "rules": {
+          "favicon": 1169183049
+        }
+    }, {  
+        "name": "Securepoint",
+        "method": "get",
+        "rules": {
+          "favicon": 1051648103
+        }
+    }, {  
+        "name": "Moodle",
+        "method": "get",
+        "rules": {
+          "favicon": -438482901
+        }
+    }, {  
+        "name": "RADIX",
+        "method": "get",
+        "rules": {
+          "favicon": -1492966240
+        }
+    }, {  
+        "name": "CradlePoint Technology (Router)",
+        "method": "get",
+        "rules": {
+          "favicon": 1466912879
+        }
+    }, {  
+        "name": "Drupal",
+        "method": "get",
+        "rules": {
+          "favicon": -167656799
+        }
+    }, {  
+        "name": "Blackboard",
+        "method": "get",
+        "rules": {
+          "favicon": -1593651747
+        }
+    }, {  
+        "name": "Jupyter Notebook",
+        "method": "get",
+        "rules": {
+          "favicon": -895963602
+        }
+    }, {  
+        "name": "HostMonster - Web hosting",
+        "method": "get",
+        "rules": {
+          "favicon": -972810761
+        }
+    }, {  
+        "name": "D-Link (router/network)",
+        "method": "get",
+        "rules": {
+          "favicon": 1703788174
+        }
+    }, {  
+        "name": "Rocket Chat",
+        "method": "get",
+        "rules": {
+          "favicon": 225632504
+        }
+    }, {  
+        "name": "mofinetwork",
+        "method": "get",
+        "rules": {
+          "favicon": -1702393021
+        }
+    }, {  
+        "name": "Zabbix",
+        "method": "get",
+        "rules": {
+          "favicon": 892542951
+        }
+    }, {  
+        "name": "TOTOLINK (network)",
+        "method": "get",
+        "rules": {
+          "favicon": 547474373
+        }
+    }, {  
+        "name": "Ossia (Provision SR) | Webcam/IP Camera",
+        "method": "get",
+        "rules": {
+          "favicon": -374235895
+        }
+    }, {  
+        "name": "cPanel Login",
+        "method": "get",
+        "rules": {
+          "favicon": 1544230796
+        }
+    }, {  
+        "name": "D-Link (router/network)",
+        "method": "get",
+        "rules": {
+          "favicon": 517158172
+        }
+    }, {  
+        "name": "Jeedom (home automation)",
+        "method": "get",
+        "rules": {
+          "favicon": 462223993
+        }
+    }, {  
+        "name": "JBoss Application Server 7",
+        "method": "get",
+        "rules": {
+          "favicon": 937999361
+        }
+    }, {  
+        "name": "Niagara Web Server / Tridium",
+        "method": "get",
+        "rules": {
+          "favicon": 1991562061
+        }
+    }, {  
+        "name": "Solarwinds Serv-U FTP Server",
+        "method": "get",
+        "rules": {
+          "favicon": 812385209
+        }
+    }, {  
+        "name": "Aruba (Virtual Controller)",
+        "method": "get",
+        "rules": {
+          "favicon": 1142227528
+        }
+    }, {  
+        "name": "Dell",
+        "method": "get",
+        "rules": {
+          "favicon": -1153950306
+        }
+    }, {  
+        "name": "RemObjects SDK / Remoting SDK for .NET HTTP Server Microsoft",
+        "method": "get",
+        "rules": {
+          "favicon": 72005642
+        }
+    }, {  
+        "name": "Zyxel ZyWALL",
+        "method": "get",
+        "rules": {
+          "favicon": -484708885
+        }
+    }, {  
+        "name": "VisualSVN Server",
+        "method": "get",
+        "rules": {
+          "favicon": 706602230
+        }
+    }, {  
+        "name": "Jboss",
+        "method": "get",
+        "rules": {
+          "favicon": -656811182
+        }
+    }, {  
+        "name": "STARFACE VoIP Software",
+        "method": "get",
+        "rules": {
+          "favicon": -332324409
+        }
+    }, {  
+        "name": "Netis (network devices)",
+        "method": "get",
+        "rules": {
+          "favicon": -594256627
+        }
+    }, {  
+        "name": "WHM",
+        "method": "get",
+        "rules": {
+          "favicon": -649378830
+        }
+    }, {  
+        "name": "Tandberg",
+        "method": "get",
+        "rules": {
+          "favicon": 97604680
+        }
+    }, {  
+        "name": "Ghost (CMS)",
+        "method": "get",
+        "rules": {
+          "favicon": -1015932800
+        }
+    }, {  
+        "name": "Avtech IP Surveillance (Camera)",
+        "method": "get",
+        "rules": {
+          "favicon": -194439630
+        }
+    }, {  
+        "name": "Liferay Portal",
+        "method": "get",
+        "rules": {
+          "favicon": 129457226
+        }
+    }, {  
+        "name": "Parallels Plesk Panel",
+        "method": "get",
+        "rules": {
+          "favicon": -771764544
+        }
+    }, {  
+        "name": "Odoo",
+        "method": "get",
+        "rules": {
+          "favicon": -617743584
+        }
+    }, {  
+        "name": "Polycom",
+        "method": "get",
+        "rules": {
+          "favicon": 77044418
+        }
+    }, {  
+        "name": "Cake PHP",
+        "method": "get",
+        "rules": {
+          "favicon": 980692677
+        }
+    }, {  
+        "name": "Exacq",
+        "method": "get",
+        "rules": {
+          "favicon": 476213314
+        }
+    }, {  
+        "name": "CheckPoint",
+        "method": "get",
+        "rules": {
+          "favicon": 794809961
+        }
+    }, {  
+        "name": "Ubiquiti UNMS",
+        "method": "get",
+        "rules": {
+          "favicon": 1157789622
+        }
+    }, {  
+        "name": "cPanel Login",
+        "method": "get",
+        "rules": {
+          "favicon": 1244636413
+        }
+    }, {  
+        "name": "WorldClient for Mdaemon",
+        "method": "get",
+        "rules": {
+          "favicon": 1985721423
+        }
+    }, {  
+        "name": "Netport Software (DSL)",
+        "method": "get",
+        "rules": {
+          "favicon": -1124868062
+        }
+    }, {  
+        "name": "f5 Big IP",
+        "method": "get",
+        "rules": {
+          "favicon": -335242539
+        }
+    }, {  
+        "name": "Mailcow",
+        "method": "get",
+        "rules": {
+          "favicon": 2146763496
+        }
+    }, {  
+        "name": "QNAP NAS Virtualization Station",
+        "method": "get",
+        "rules": {
+          "favicon": -1041180225
+        }
+    }, {  
+        "name": "Netgear",
+        "method": "get",
+        "rules": {
+          "favicon": -1319025408
+        }
+    }, {  
+        "name": "Gogs",
+        "method": "get",
+        "rules": {
+          "favicon": 917966895
+        }
+    }, {  
+        "name": "Trendnet IP camera",
+        "method": "get",
+        "rules": {
+          "favicon": 512590457
+        }
+    }, {  
+        "name": "Asustor",
+        "method": "get",
+        "rules": {
+          "favicon": 1678170702
+        }
+    }, {  
+        "name": "Dahua",
+        "method": "get",
+        "rules": {
+          "favicon": -1466785234
+        }
+    }, {  
+        "name": "Discuz!",
+        "method": "get",
+        "rules": {
+          "favicon": -505448917
+        }
+    }, {
+        "name": "Discuz!",
+        "method": "get",
+        "rules": {
+          "body": ["Discuz!","Comsenz","cache/"]
+        }
+    }, {  
+        "name": "wdCP cloud host management system",
+        "method": "get",
+        "rules": {
+          "favicon": 255892555
+        }
+    }, {  
+        "name": "Joomla",
+        "method": "get",
+        "rules": {
+          "favicon": 1627330242
+        }
+    }, {  
+        "name": "SmarterMail",
+        "method": "get",
+        "rules": {
+          "favicon": -1935525788
+        }
+    }, {  
+        "name": "Seafile",
+        "method": "get",
+        "rules": {
+          "favicon": -12700016
+        }
+    }, {  
+        "name": "bintec elmeg",
+        "method": "get",
+        "rules": {
+          "favicon": 1770799630
+        }
+    }, {  
+        "name": "NETGEAR ReadyNAS",
+        "method": "get",
+        "rules": {
+          "favicon": -137295400
+        }
+    }, {  
+        "name": "iPECS",
+        "method": "get",
+        "rules": {
+          "favicon": -195508437
+        }
+    }, {  
+        "name": "bet365",
+        "method": "get",
+        "rules": {
+          "favicon": -2116540786
+        }
+    }, {  
+        "name": "Reolink",
+        "method": "get",
+        "rules": {
+          "favicon": -38705358
+        }
+    }, {  
+        "name": "idera",
+        "method": "get",
+        "rules": {
+          "favicon": -450254253
+        }
+    }, {  
+        "name": "Proofpoint",
+        "method": "get",
+        "rules": {
+          "favicon": -1630354993
+        }
+    }, {  
+        "name": "Kerio Connect WebMail",
+        "method": "get",
+        "rules": {
+          "favicon": -1678298769
+        }
+    }, {  
+        "name": "WorldClient for Mdaemon",
+        "method": "get",
+        "rules": {
+          "favicon": -35107086
+        }
+    }, {  
+        "name": "Realtek",
+        "method": "get",
+        "rules": {
+          "favicon": 2055322029
+        }
+    }, {  
+        "name": "Ruijie Networks (Login)",
+        "method": "get",
+        "rules": {
+          "favicon": -692947551
+        }
+    }, {  
+        "name": "Askey Cable Modem",
+        "method": "get",
+        "rules": {
+          "favicon": -1710631084
+        }
+    }, {  
+        "name": "Askey Cable Modem",
+        "method": "get",
+        "rules": {
+          "favicon": 89321398
+        }
+    }, {  
+        "name": "JAWS Web Server (IP Camera)",
+        "method": "get",
+        "rules": {
+          "favicon": 90066852
+        }
+    }, {  
+        "name": "JAWS Web Server (IP Camera)",
+        "method": "get",
+        "rules": {
+          "favicon": 768231242
+        }
+    }, {  
+        "name": "Homegrown Website Hosting",
+        "method": "get",
+        "rules": {
+          "favicon": -421986013
+        }
+    }, {  
+        "name": "Technicolor / Thomson Speedtouch (Network / ADSL)",
+        "method": "get",
+        "rules": {
+          "favicon": 156312019
+        }
+    }, {  
+        "name": "DVR (Korean)",
+        "method": "get",
+        "rules": {
+          "favicon": -560297467
+        }
+    }, {  
+        "name": "Joomla",
+        "method": "get",
+        "rules": {
+          "favicon": -1950415971
+        }
+    }, {  
+        "name": "TP-LINK (Network Device)",
+        "method": "get",
+        "rules": {
+          "favicon": 1842351293
+        }
+    }, {  
+        "name": "Salesforce",
+        "method": "get",
+        "rules": {
+          "favicon": 1433417005
+        }
+    }, {  
+        "name": "Apache Haus",
+        "method": "get",
+        "rules": {
+          "favicon": -632070065
+        }
+    }, {  
+        "name": "Untangle",
+        "method": "get",
+        "rules": {
+          "favicon": 1103599349
+        }
+    }, {  
+        "name": "Shenzhen coship electronics co.",
+        "method": "get",
+        "rules": {
+          "favicon": 224536051
+        }
+    }, {  
+        "name": "D-Link (router/network)",
+        "method": "get",
+        "rules": {
+          "favicon": 1038500535
+        }
+    }, {  
+        "name": "D-Link (camera)",
+        "method": "get",
+        "rules": {
+          "favicon": -355305208
+        }
+    }, {  
+        "name": "Kibana",
+        "method": "get",
+        "rules": {
+          "favicon": -267431135
+        }
+    }, {  
+        "name": "Kibana",
+        "method": "get",
+        "rules": {
+          "favicon": -759754862
+        }
+    }, {  
+        "name": "Kibana",
+        "method": "get",
+        "rules": {
+          "favicon": -1200737715
+        }
+    }, {  
+        "name": "Kibana",
+        "method": "get",
+        "rules": {
+          "favicon": 75230260
+        }
+    }, {  
+        "name": "Kibana",
+        "method": "get",
+        "rules": {
+          "favicon": 1668183286
+        }
+    }, {  
+        "name": "Intelbras SA",
+        "method": "get",
+        "rules": {
+          "favicon": 283740897
+        }
+    }, {  
+        "name": "Icecast Streaming Media Server",
+        "method": "get",
+        "rules": {
+          "favicon": 1424295654
+        }
+    }, {  
+        "name": "NEC WebPro",
+        "method": "get",
+        "rules": {
+          "favicon": 1922032523
+        }
+    }, {  
+        "name": "Vivotek (Camera)",
+        "method": "get",
+        "rules": {
+          "favicon": -1654229048
+        }
+    }, {  
+        "name": "Microsoft IIS",
+        "method": "get",
+        "rules": {
+          "favicon": -1414475558
+        }
+    }, {  
+        "name": "Univention Portal",
+        "method": "get",
+        "rules": {
+          "favicon": -1697334194
+        }
+    }, {  
+        "name": "Portainer (Docker Management)",
+        "method": "get",
+        "rules": {
+          "favicon": -1424036600
+        }
+    }, {  
+        "name": "NOS Router",
+        "method": "get",
+        "rules": {
+          "favicon": -831826827
+        }
+    }, {  
+        "name": "Tongda",
+        "method": "get",
+        "rules": {
+          "favicon": -759108386
+        }
+    }, {  
+        "name": "CrushFTP",
+        "method": "get",
+        "rules": {
+          "favicon": -1022206565
+        }
+    }, {  
+        "name": "Endian Firewall",
+        "method": "get",
+        "rules": {
+          "favicon": -1225484776
+        }
+    }, {  
+        "name": "Kerio Control Firewall",
+        "method": "get",
+        "rules": {
+          "favicon": -631002664
+        }
+    }, {  
+        "name": "Ferozo Panel",
+        "method": "get",
+        "rules": {
+          "favicon": 2072198544
+        }
+    }, {  
+        "name": "Kerio Control Firewall",
+        "method": "get",
+        "rules": {
+          "favicon": -466504476
+        }
+    }, {  
+        "name": "Cafe24 (Korea)",
+        "method": "get",
+        "rules": {
+          "favicon": 1251810433
+        }
+    }, {  
+        "name": "Mautic (Open Source Marketing Automation)",
+        "method": "get",
+        "rules": {
+          "favicon": 1273982002
+        }
+    }, {  
+        "name": "NETIASPOT (Network)",
+        "method": "get",
+        "rules": {
+          "favicon": -978656757
+        }
+    }, {  
+        "name": "Multilaser",
+        "method": "get",
+        "rules": {
+          "favicon": 916642917
+        }
+    }, {  
+        "name": "Canvas LMS (Learning Management)",
+        "method": "get",
+        "rules": {
+          "favicon": 575613323
+        }
+    }, {  
+        "name": "IBM Server",
+        "method": "get",
+        "rules": {
+          "favicon": 1726027799
+        }
+    }, {  
+        "name": "ADB Broadband S.p.A. (Network)",
+        "method": "get",
+        "rules": {
+          "favicon": -587741716
+        }
+    }, {  
+        "name": "ARRIS (Network)",
+        "method": "get",
+        "rules": {
+          "favicon": -360566773
+        }
+    }, {  
+        "name": "Huawei (Network)",
+        "method": "get",
+        "rules": {
+          "favicon": -884776764
+        }
+    }, {  
+        "name": "WAMPSERVER",
+        "method": "get",
+        "rules": {
+          "favicon": 929825723
+        }
+    }, {  
+        "name": "Seagate Technology (NAS)",
+        "method": "get",
+        "rules": {
+          "favicon": 240136437
+        }
+    }, {  
+        "name": "UPC Ceska Republica (Network)",
+        "method": "get",
+        "rules": {
+          "favicon": 1911253822
+        }
+    }, {  
+        "name": "Flussonic (Video Streaming)",
+        "method": "get",
+        "rules": {
+          "favicon": -393788031
+        }
+    }, {  
+        "name": "Joomla",
+        "method": "get",
+        "rules": {
+          "favicon": 366524387
+        }
+    }, {  
+        "name": "WAMPSERVER",
+        "method": "get",
+        "rules": {
+          "favicon": 443944613
+        }
+    }, {  
+        "name": "Metabase",
+        "method": "get",
+        "rules": {
+          "favicon": 1953726032
+        }
+    }, {  
+        "name": "D-Link (Network)",
+        "method": "get",
+        "rules": {
+          "favicon": -2031183903
+        }
+    }, {  
+        "name": "MobileIron",
+        "method": "get",
+        "rules": {
+          "favicon": 545827989
+        }
+    }, {  
+        "name": "MobileIron",
+        "method": "get",
+        "rules": {
+          "favicon": 967636089
+        }
+    }, {  
+        "name": "MobileIron",
+        "method": "get",
+        "rules": {
+          "favicon": 362091310
+        }
+    }, {  
+        "name": "MobileIron",
+        "method": "get",
+        "rules": {
+          "favicon": 2086228042
+        }
+    }, {  
+        "name": "CommuniGate",
+        "method": "get",
+        "rules": {
+          "favicon": -1588746893
+        }
+    }, {  
+        "name": "ZTE (Network)",
+        "method": "get",
+        "rules": {
+          "favicon": 1427976651
+        }
+    }, {  
+        "name": "InfiNet Wireless | WANFleX (Network)",
+        "method": "get",
+        "rules": {
+          "favicon": 1648531157
+        }
+    }, {  
+        "name": "Mersive Solstice",
+        "method": "get",
+        "rules": {
+          "favicon": 938616453
+        }
+    }, {  
+        "name": "Université Toulouse 1 Capitole",
+        "method": "get",
+        "rules": {
+          "favicon": 1632780968
+        }
+    }, {  
+        "name": "Digium (Switchvox)",
+        "method": "get",
+        "rules": {
+          "favicon": 2068154487
+        }
+    }, {  
+        "name": "PowerMTA monitoring",
+        "method": "get",
+        "rules": {
+          "favicon": -1788112745
+        }
+    }, {  
+        "name": "SmartLAN/G",
+        "method": "get",
+        "rules": {
+          "favicon": -644617577
+        }
+    }, {  
+        "name": "Checkpoint (Gaia)",
+        "method": "get",
+        "rules": {
+          "favicon": -1822098181
+        }
+    }, {  
+        "name": "УТМ (Federal Service for Alcohol Market Regulation | Russia)",
+        "method": "get",
+        "rules": {
+          "favicon": -1131689409
+        }
+    }, {  
+        "name": "MailWizz",
+        "method": "get",
+        "rules": {
+          "favicon": 2127152956
+        }
+    }, {  
+        "name": "RabbitMQ",
+        "method": "get",
+        "rules": {
+          "favicon": 1064742722
+        }
+    }, {  
+        "name": "openmediavault (NAS)",
+        "method": "get",
+        "rules": {
+          "favicon": -693082538
+        }
+    }, {  
+        "name": "openWRT Luci",
+        "method": "get",
+        "rules": {
+          "favicon": 1941381095
+        }
+    }, {  
+        "name": "Honeywell",
+        "method": "get",
+        "rules": {
+          "favicon": 903086190
+        }
+    }, {  
+        "name": "BOMGAR Support Portal",
+        "method": "get",
+        "rules": {
+          "favicon": 829321644
+        }
+    }, {  
+        "name": "Nuxt JS",
+        "method": "get",
+        "rules": {
+          "favicon": -1442789563
+        }
+    }, {  
+        "name": "RoundCube Webmail",
+        "method": "get",
+        "rules": {
+          "favicon": -2140379067
+        }
+    }, {  
+        "name": "D-Link (camera)",
+        "method": "get",
+        "rules": {
+          "favicon": -1897829998
+        }
+    }, {  
+        "name": "Netgear (Network)",
+        "method": "get",
+        "rules": {
+          "favicon": 1047213685
+        }
+    }, {  
+        "name": "SonarQube",
+        "method": "get",
+        "rules": {
+          "favicon": 1485257654
+        }
+    }, {  
+        "name": "Lupus Electronics XT",
+        "method": "get",
+        "rules": {
+          "favicon": -299324825
+        }
+    }, {  
+        "name": "Vanderbilt SPC",
+        "method": "get",
+        "rules": {
+          "favicon": -1162730477
+        }
+    }, {  
+        "name": "VZPP Plesk",
+        "method": "get",
+        "rules": {
+          "favicon": -1268095485
+        }
+    }, {  
+        "name": "Baidu",
+        "method": "get",
+        "rules": {
+          "favicon": 1118684072
+        }
+    }, {  
+        "name": "ownCloud",
+        "method": "get",
+        "rules": {
+          "favicon": -1616115760
+        }
+    }, {  
+        "name": "Sentora",
+        "method": "get",
+        "rules": {
+          "favicon": -2054889066
+        }
+    }, {  
+        "name": "Alfresco",
+        "method": "get",
+        "rules": {
+          "favicon": 1333537166
+        }
+    }, {  
+        "name": "Digital Keystone (DK)",
+        "method": "get",
+        "rules": {
+          "favicon": -373674173
+        }
+    }, {  
+        "name": "WISPR (Airlan)",
+        "method": "get",
+        "rules": {
+          "favicon": -106646451
+        }
+    }, {  
+        "name": "Synology VPN Plus",
+        "method": "get",
+        "rules": {
+          "favicon": 1235070469
+        }
+    }, {  
+        "name": "Sentry",
+        "method": "get",
+        "rules": {
+          "favicon": 2063428236
+        }
+    }, {  
+        "name": "WatchGuard",
+        "method": "get",
+        "rules": {
+          "favicon": 15831193
+        }
+    }, {  
+        "name": "Web Client Pro",
+        "method": "get",
+        "rules": {
+          "favicon": -956471263
+        }
+    }, {  
+        "name": "Tecvoz",
+        "method": "get",
+        "rules": {
+          "favicon": -1452159623
+        }
+    }, {  
+        "name": "MDaemon Remote Administration",
+        "method": "get",
+        "rules": {
+          "favicon": 99432374
+        }
+    }, {  
+        "name": "Paradox IP Module",
+        "method": "get",
+        "rules": {
+          "favicon": 727253975
+        }
+    }, {  
+        "name": "DokuWiki",
+        "method": "get",
+        "rules": {
+          "favicon": -630493013
+        }
+    }, {  
+        "name": "Sails",
+        "method": "get",
+        "rules": {
+          "favicon": 552597979
+        }
+    }, {  
+        "name": "FastPanel Hosting",
+        "method": "get",
+        "rules": {
+          "favicon": 774252049
+        }
+    }, {  
+        "name": "C-Lodop",
+        "method": "get",
+        "rules": {
+          "favicon": -329747115
+        }
+    }, {  
+        "name": "Jamf Pro Login",
+        "method": "get",
+        "rules": {
+          "favicon": 1262005940
+        }
+    }, {  
+        "name": "StruxureWare (Schneider Electric)",
+        "method": "get",
+        "rules": {
+          "favicon": 979634648
+        }
+    }, {  
+        "name": "Axcient Replibit Management Server",
+        "method": "get",
+        "rules": {
+          "favicon": 475379699
+        }
+    }, {  
+        "name": "Twonky Server (Media Streaming)",
+        "method": "get",
+        "rules": {
+          "favicon": -878891718
+        }
+    }, {  
+        "name": "Windows Azure",
+        "method": "get",
+        "rules": {
+          "favicon": -2125083197
+        }
+    }, {  
+        "name": "ISP Manager (Web Hosting Panel)",
+        "method": "get",
+        "rules": {
+          "favicon": -1151675028
+        }
+    }, {  
+        "name": "JupyterHub",
+        "method": "get",
+        "rules": {
+          "favicon": 1248917303
+        }
+    }, {  
+        "name": "CenturyLink Modem GUI Login (eg: Technicolor)",
+        "method": "get",
+        "rules": {
+          "favicon": -1908556829
+        }
+    }, {  
+        "name": "Tecvoz",
+        "method": "get",
+        "rules": {
+          "favicon": 1059329877
+        }
+    }, {  
+        "name": "OPNsense",
+        "method": "get",
+        "rules": {
+          "favicon": -1148190371
+        }
+    }, {  
+        "name": "Ligowave (network)",
+        "method": "get",
+        "rules": {
+          "favicon": 1467395679
+        }
+    }, {  
+        "name": "Rumpus",
+        "method": "get",
+        "rules": {
+          "favicon": -1528414776
+        }
+    }, {  
+        "name": "Spiceworks (panel)",
+        "method": "get",
+        "rules": {
+          "favicon": -2117390767
+        }
+    }, {  
+        "name": "TeamCity",
+        "method": "get",
+        "rules": {
+          "favicon": -1944119648
+        }
+    }, {  
+        "name": "INSTAR Full-HD IP-Camera",
+        "method": "get",
+        "rules": {
+          "favicon": -1748763891
+        }
+    }, {  
+        "name": "GPON Home Gateway",
+        "method": "get",
+        "rules": {
+          "favicon": 251106693
+        }
+    }, {  
+        "name": "Alienvault",
+        "method": "get",
+        "rules": {
+          "favicon": -1779611449
+        }
+    }, {  
+        "name": "Arbor Networks",
+        "method": "get",
+        "rules": {
+          "favicon": -1745552996
+        }
+    }, {  
+        "name": "Accrisoft",
+        "method": "get",
+        "rules": {
+          "favicon": -1275148624
+        }
+    }, {  
+        "name": "Yasni",
+        "method": "get",
+        "rules": {
+          "favicon": -178685903
+        }
+    }, {  
+        "name": "Slack",
+        "method": "get",
+        "rules": {
+          "favicon": -43161126
+        }
+    }, {  
+        "name": "innovaphone",
+        "method": "get",
+        "rules": {
+          "favicon": 671221099
+        }
+    }, {  
+        "name": "Shinobi (CCTV)",
+        "method": "get",
+        "rules": {
+          "favicon": -10974981
+        }
+    }, {  
+        "name": "TP-LINK (Network Device)",
+        "method": "get",
+        "rules": {
+          "favicon": 1274078387
+        }
+    }, {  
+        "name": "Siemens OZW772",
+        "method": "get",
+        "rules": {
+          "favicon": -336242473
+        }
+    }, {  
+        "name": "Lantronix (Spider)",
+        "method": "get",
+        "rules": {
+          "favicon": 882208493
+        }
+    }, {  
+        "name": "ClaimTime (Ramsell Public Health & Safety)",
+        "method": "get",
+        "rules": {
+          "favicon": -687783882
+        }
+    }, {  
+        "name": "Surfilter SSL VPN Portal",
+        "method": "get",
+        "rules": {
+          "favicon": -590892202
+        }
+    }, {  
+        "name": "Kyocera (Printer)",
+        "method": "get",
+        "rules": {
+          "favicon": -50306417
+        }
+    }, {  
+        "name": "Lucee!",
+        "method": "get",
+        "rules": {
+          "favicon": 784872924
+        }
+    }, {  
+        "name": "Ricoh",
+        "method": "get",
+        "rules": {
+          "favicon": 1135165421
+        }
+    }, {  
+        "name": "Handle Proxy",
+        "method": "get",
+        "rules": {
+          "favicon": 926501571
+        }
+    }, {  
+        "name": "Metasploit",
+        "method": "get",
+        "rules": {
+          "favicon": 579239725
+        }
+    }, {  
+        "name": "iomega NAS",
+        "method": "get",
+        "rules": {
+          "favicon": -689902428
+        }
+    }, {  
+        "name": "iomega NAS",
+        "method": "get",
+        "rules": {
+          "favicon": -600508822
+        }
+    }, {  
+        "name": "iomega NAS",
+        "method": "get",
+        "rules": {
+          "favicon": 656868270
+        }
+    }, {  
+        "name": "iomega NAS",
+        "method": "get",
+        "rules": {
+          "favicon": -2056503929
+        }
+    }, {  
+        "name": "iomega NAS",
+        "method": "get",
+        "rules": {
+          "favicon": -1656695885
+        }
+    }, {  
+        "name": "iomega NAS",
+        "method": "get",
+        "rules": {
+          "favicon": 331870709
+        }
+    }, {  
+        "name": "iomega NAS",
+        "method": "get",
+        "rules": {
+          "favicon": 1241049726
+        }
+    }, {  
+        "name": "iomega NAS",
+        "method": "get",
+        "rules": {
+          "favicon": 998138196
+        }
+    }, {  
+        "name": "iomega NAS",
+        "method": "get",
+        "rules": {
+          "favicon": 322531336
+        }
+    }, {  
+        "name": "iomega NAS",
+        "method": "get",
+        "rules": {
+          "favicon": -401934945
+        }
+    }, {  
+        "name": "iomega NAS",
+        "method": "get",
+        "rules": {
+          "favicon": -613216179
+        }
+    }, {  
+        "name": "Chef Automate",
+        "method": "get",
+        "rules": {
+          "favicon": -276759139
+        }
+    }, {  
+        "name": "Gargoyle Router Management Utility",
+        "method": "get",
+        "rules": {
+          "favicon": 1862132268
+        }
+    }, {  
+        "name": "KeepItSafe Management Console",
+        "method": "get",
+        "rules": {
+          "favicon": -1738727418
+        }
+    }, {  
+        "name": "Entronix Energy Management Platform",
+        "method": "get",
+        "rules": {
+          "favicon": -368490461
+        }
+    }, {  
+        "name": "OpenProject",
+        "method": "get",
+        "rules": {
+          "favicon": 1836828108
+        }
+    }, {  
+        "name": "Unified Management Console (Polycom)",
+        "method": "get",
+        "rules": {
+          "favicon": -1775553655
+        }
+    }, {  
+        "name": "Moxapass ioLogik Remote Ethernet I/O Server ",
+        "method": "get",
+        "rules": {
+          "favicon": 381100274
+        }
+    }, {  
+        "name": "HFS (HTTP File Server)",
+        "method": "get",
+        "rules": {
+          "favicon": 2124459909
+        }
+    }, {  
+        "name": "HFS (HTTP File Server)",
+        "method": "get",
+        "rules": {
+          "favicon": 731374291
+        }
+    }, {  
+        "name": "Traccar GPS tracking",
+        "method": "get",
+        "rules": {
+          "favicon": -335153896
+        }
+    }, {  
+        "name": "IW",
+        "method": "get",
+        "rules": {
+          "favicon": 896412703
+        }
+    }, {  
+        "name": "Wordpress Under Construction Icon",
+        "method": "get",
+        "rules": {
+          "favicon": 191654058
+        }
+    }, {  
+        "name": "Combivox",
+        "method": "get",
+        "rules": {
+          "favicon": -342262483
+        }
+    }, {  
+        "name": "NetComWireless (Network)",
+        "method": "get",
+        "rules": {
+          "favicon": 5542029
+        }
+    }, {  
+        "name": "Elastic (Database)",
+        "method": "get",
+        "rules": {
+          "favicon": 1552860581
+        }
+    }, {  
+        "name": "Drupal",
+        "method": "get",
+        "rules": {
+          "favicon": 1174841451
+        }
+    }, {  
+        "name": "truVision (NVR)",
+        "method": "get",
+        "rules": {
+          "favicon": -1093172228
+        }
+    }, {  
+        "name": "SpamExperts",
+        "method": "get",
+        "rules": {
+          "favicon": -1688698891
+        }
+    }, {  
+        "name": "Sonatype Nexus Repository Manager",
+        "method": "get",
+        "rules": {
+          "favicon": -1546574541
+        }
+    }, {  
+        "name": "iDirect Canada (Network Management)",
+        "method": "get",
+        "rules": {
+          "favicon": -256828986
+        }
+    }, {  
+        "name": "OpenERP (now known as Odoo)",
+        "method": "get",
+        "rules": {
+          "favicon": 1966198264
+        }
+    }, {  
+        "name": "PKP (OpenJournalSystems) Public Knowledge Project",
+        "method": "get",
+        "rules": {
+          "favicon": 2099342476
+        }
+    }, {  
+        "name": "LiquidFiles",
+        "method": "get",
+        "rules": {
+          "favicon": 541087742
+        }
+    }, {  
+        "name": "ZyXEL (Network)",
+        "method": "get",
+        "rules": {
+          "favicon": -882760066
+        }
+    }, {  
+        "name": "Universal Devices (UD)",
+        "method": "get",
+        "rules": {
+          "favicon": 16202868
+        }
+    }, {  
+        "name": "Huawei (Network)",
+        "method": "get",
+        "rules": {
+          "favicon": 987967490
+        }
+    },{
+        "name": "Gitea",
+        "method": "get",
+        "rules": {
+          "favicon": 1969970750
+        }
+    }, {  
+        "name": "TC-Group",
+        "method": "get",
+        "rules": {
+          "favicon": -1734573358
+        }
+    }, {  
+        "name": "Deluge Web UI",
+        "method": "get",
+        "rules": {
+          "favicon": -1589842876
+        }
+    }, {  
+        "name": "AMH 云主机面板",
+        "method": "get",
+        "rules": {
+          "favicon": 1822002133
+        }
+    }, {  
+        "name": "OTRS (Open Ticket Request System)",
+        "method": "get",
+        "rules": {
+          "favicon": -2006308185
+        }
+    }, {  
+        "name": "Bosch Security Systems (Camera)",
+        "method": "get",
+        "rules": {
+          "favicon": -1702769256
+        }
+    }, {  
+        "name": "Node-RED",
+        "method": "get",
+        "rules": {
+          "favicon": 321591353
+        }
+    }, {  
+        "name": "motionEye (camera)",
+        "method": "get",
+        "rules": {
+          "favicon": -923693877
+        }
+    }, {  
+        "name": "Saia Burgess Controls – PCD",
+        "method": "get",
+        "rules": {
+          "favicon": -1547576879
+        }
+    }, {  
+        "name": "Arcadyan o2 box (Network)",
+        "method": "get",
+        "rules": {
+          "favicon": 1479202414
+        }
+    }, {  
+        "name": "D-Link (Network)",
+        "method": "get",
+        "rules": {
+          "favicon": 1081719753
+        }
+    }, {  
+        "name": "Abilis (Network/Automation)",
+        "method": "get",
+        "rules": {
+          "favicon": -166151761
+        }
+    }, {  
+        "name": "Ghost (CMS)",
+        "method": "get",
+        "rules": {
+          "favicon": -1231681737
+        }
+    }, {  
+        "name": "Airwatch",
+        "method": "get",
+        "rules": {
+          "favicon": 321909464
+        }
+    }, {  
+        "name": "Airwatch",
+        "method": "get",
+        "rules": {
+          "favicon": -1153873472
+        }
+    }, {  
+        "name": "Airwatch",
+        "method": "get",
+        "rules": {
+          "favicon": 1095915848
+        }
+    }, {  
+        "name": "Airwatch",
+        "method": "get",
+        "rules": {
+          "favicon": 788771792
+        }
+    }, {  
+        "name": "Airwatch",
+        "method": "get",
+        "rules": {
+          "favicon": -1863663974
+        }
+    }, {  
+        "name": "KeyHelp (Keyweb AG)",
+        "method": "get",
+        "rules": {
+          "favicon": -1267819858
+        }
+    }, {  
+        "name": "KeyHelp (Keyweb AG)",
+        "method": "get",
+        "rules": {
+          "favicon": 726817668
+        }
+    }, {  
+        "name": "GLPI",
+        "method": "get",
+        "rules": {
+          "favicon": -1474875778
+        }
+    }, {  
+        "name": "Netcom Technology",
+        "method": "get",
+        "rules": {
+          "favicon": 5471989
+        }
+    }, {  
+        "name": "CradlePoint",
+        "method": "get",
+        "rules": {
+          "favicon": -1457536113
+        }
+    }, {  
+        "name": "MyASP",
+        "method": "get",
+        "rules": {
+          "favicon": -736276076
+        }
+    }, {  
+        "name": "Intelbras SA",
+        "method": "get",
+        "rules": {
+          "favicon": -1343070146
+        }
+    }, {  
+        "name": "Lenel",
+        "method": "get",
+        "rules": {
+          "favicon": 538585915
+        }
+    }, {  
+        "name": "OkoFEN Pellematic",
+        "method": "get",
+        "rules": {
+          "favicon": -625364318
+        }
+    }, {  
+        "name": "SimpleHelp (Remote Support)",
+        "method": "get",
+        "rules": {
+          "favicon": 1117165781
+        }
+    }, {  
+        "name": "GraphQL",
+        "method": "get",
+        "rules": {
+          "favicon": -1067420240
+        }
+    }, {  
+        "name": "DNN (CMS)",
+        "method": "get",
+        "rules": {
+          "favicon": -1465479343
+        }
+    }, {  
+        "name": "Apple",
+        "method": "get",
+        "rules": {
+          "favicon": 1232159009
+        }
+    }, {  
+        "name": "Apple",
+        "method": "get",
+        "rules": {
+          "favicon": 1382324298
+        }
+    }, {  
+        "name": "Apple",
+        "method": "get",
+        "rules": {
+          "favicon": -1498185948
+        }
+    }, {  
+        "name": "ISPConfig",
+        "method": "get",
+        "rules": {
+          "favicon": 483383992
+        }
+    }, {  
+        "name": "Microsoft Outlook",
+        "method": "get",
+        "rules": {
+          "favicon": -1249852061
+        }
+    }, {  
+        "name": "Hikvision IP Camera",
+        "method": "get",
+        "rules": {
+          "favicon": 999357577
+        }
+    }, {  
+        "name": "IP Camera",
+        "method": "get",
+        "rules": {
+          "favicon": 492290497
+        }
+    }, {  
+        "name": "AfterLogicWebMail系统",
+        "method": "get",
+        "rules": {
+          "favicon": -194791768
+        }
+    }, {  
+        "name": "B2Bbuilder",
+        "method": "get",
+        "rules": {
+          "favicon": 492941040
+        }
+    }, {  
+        "name": "深信服下一代防火墙管理系统",
+        "method": "get",
+        "rules": {
+          "favicon": 123821839
+        }
+    }, {  
+        "name": "深信服WEB防篡改管理系统",
+        "method": "get",
+        "rules": {
+          "body": ["WEB防篡改","cgi-bin/tamper_admin.cgi"]
+        }
+    }, {  
+        "name": "YApi 可视化接口管理平台",
+        "method": "get",
+        "rules": {
+          "body": ["YApi","id=\"yapi\"","prd","可视化接口管理平台"]
+        }
+    }, {  
+        "name": "JumpServer 堡垒机",
+        "method": "get",
+        "rules": {
+          "favicon": -1162630024
+        }
+    }, {  
+        "name": "WeiPHP",
+        "method": "get",
+        "rules": {
+          "body": ["weiphp.css","weiphp","Public/static"]
+        }
+    }, {  
+        "name": "Nagios XI",
+        "method": "get",
+        "rules": {
+          "body": ["Nagios XI","nagiosxi","Nagios"]
+        }
+    }, {  
+        "name": "ShowDoc",
+        "method": "get",
+        "rules": {
+          "favicon": 1969934080
+        }
+    }, {  
+        "name": "群晖 NAS",
+        "method": "get",
+        "rules": {
+          "body": ["DiskStation","webman/modules","NAS"]
+        }
+    }, {  
+        "name": "协达OA",
+        "method": "get",
+        "rules": {
+          "favicon": -1850889691
+        }
+    }, {  
+        "name": "山石网科 防火墙",
+        "method": "get",
+        "rules": {
+          "body": ["Hillstone","licenseAggrement","GLOBAL_CONFIG.js"]
+        }
+    }, {  
+        "name": "360天堤新一代智慧防火墙",
+        "method": "get",
+        "rules": {
+          "body": ["360天堤","360","360防火墙"]
+        }
+    }, {  
+        "name": "360网神防火墙系统",
+        "method": "get",
+        "rules": {
+          "body": ["resources/image/logo_header.png","360","网神防火墙系统"]
+        }
+    }, {  
+        "name": "网神SecGate 3600防火墙",
+        "method": "get",
+        "rules": {
+          "body": ["网神SecGate","3600防火墙","css/lsec/login.css"]
+        }
+    }, {  
+        "name": "蓝盾防火墙",
+        "method": "get",
+        "rules": {
+          "body": ["蓝盾","Bluedon","default/js/act/login.js"]
+        }
+    }, {  
+        "name": "LanProxy",
+        "method": "get",
+        "rules": {
+          "body": ["LanProxy","password","lanproxy-config"]
+        }
+    }, {  
+        "name": "ManageEngine ADManager Plus",
+        "method": "get",
+        "rules": {
+          "body": ["ADManager","Hashtable.js","ManageEngine"]
+        }
+    }, {  
+        "name": "phpshe 商城系统",
+        "method": "get",
+        "rules": {
+          "body": ["Powered by phpshe","include/js/global.js"]
+        }
+    }, {  
+        "name": "骑士 74CMS",
+        "method": "get",
+        "rules": {
+          "body": ["74cms","qscms.root","index.php"]
+        }
+    }, {  
+        "name": "Apache2 Debian 默认页",
+        "method": "get",
+        "rules": {
+          "body": ["Apache2 Debian Default","It works!","Debian Logo"]
+        }
+    }, {  
+        "name": "Grafana",
+        "method": "get",
+        "rules": {
+          "body": ["Grafana","login","grafana-app"]
+        }
+    }, {  
+        "name": "Canal Admin",
+        "method": "get",
+        "rules": {
+          "body": ["Canal Admin","js/app"]
+        }
+    }, {  
+        "name": "IBOS酷办公OA系统",
+        "method": "get",
+        "rules": {
+          "body": ["IBOS","login-panel","loginsubmit"]
+        }
+    }, {  
+        "name": "若依(RuoYi)-管理系统",
+        "method": "get",
+        "rules": {
+          "body": ["ry-ui","username","rememberme"]
+        }
+    }, {  
+        "name": "中新金盾信息安全管理系统",
+        "method": "get",
+        "rules": {
+          "body": ["中新金盾信息安全管理系统","login","useusbkey"]
+        }
+    }, {  
+        "name": "中成科信 综合管理平台",
+        "method": "get",
+        "rules": {
+          "favicon": 1632964065
+        }
+    }, {  
+        "name": "VMware vCenter",
+        "method": "get",
+        "rules": {
+          "body": ["VMware","ID_VISDK","download"]
+        }
+    }, {  
+        "name": "AWS S3 Bucket",
+        "method": "get",
+        "rules": {
+          "body": ["InvalidBucketName","aliyuncs"]
+        }
+    }, {  
+        "name": "网心云设备",
+        "method": "get",
+        "rules": {
+          "body": ["网心云设备","favicon.png"]
+        }
+    }, {  
+        "name": "深信服 NGAF",
+        "method": "get",
+        "rules": {
+          "body": ["SANGFOR","NGAF","login"]
+        }
+    }, {  
+        "name": "IBM HTTP Server",
+        "method": "get",
+        "rules": {
+          "body": ["IBM HTTP Server","Support"]
+        }
+    }, {  
+        "name": "nps",
+        "method": "get",
+        "rules": {
+          "body": ["nps","ehang","login"]
+        }
+    }, {  
+        "name": "Webmin",
+        "method": "get",
+        "rules": {
+          "body": ["Webmin","session_login"]
+        }
+    }, {  
+        "name": "群晖 DiskStation",
+        "method": "get",
+        "rules": {
+          "body": ["DiskStation","文件服务器","modules"]
+        }
+    }, {  
+        "name": "锐捷 SSLVPN",
+        "method": "get",
+        "rules": {
+          "body": ["SSLVPN","rjweb","login"]
+        }
+    }, {  
+        "name": "蜂网企业流控云路由器",
+        "method": "get",
+        "rules": {
+          "body": ["ifw8","企业级流控云路由器","login"]
+        }
+    }, {  
+        "name": "网御 安全网关",
+        "method": "get",
+        "rules": {
+          "body": ["安全系统","网御星云","login"]
+        }
+    }, {  
+        "name": "Citrix Access Gateway",
+        "method": "get",
+        "rules": {
+          "body": ["Citrix Access Gateway","login"]
+        }
+    }, {  
+        "name": "深信服安全感知平台",
+        "method": "get",
+        "rules": {
+          "body": ["安全感知平台","login.js","apps"]
+        }
+    }, {  
+        "name": "Apache2 Ubuntu 默认页",
+        "method": "get",
+        "rules": {
+          "body": ["Apache2 Ubuntu Default Page","ubuntu-logo.png"]
+        }
+    }, {  
+        "name": "帆软报表-FineReport",
+        "method": "get",
+        "rules": {
+          "body": ["ReportServer","=fs"]
+        }
+    }, {  
+        "name": "CAS 单点登录",
+        "method": "get",
+        "rules": {
+          "body": ["Central Authentication Service","cas/login"]
+        }
+    }, {  
+        "name": "海康威视 流媒体管理服务器",
+        "method": "get",
+        "rules": {
+          "body": ["流媒体管理服务器","MSHTML","login"]
+        }
+    }, {  
+        "name": "noVNC 远程访问",
+        "method": "get",
+        "rules": {
+          "body": ["noVNC","<span>no</span>","host"]
+        }
+    }, {  
+        "name": "MessageSolution Enterprise Email Archiving (EEA)",
+        "method": "get",
+        "rules": {
+          "body": ["MessageSolution","index.jsp"]
+        }
+    }, {  
+        "name": "阿里巴巴otter manager",
+        "method": "get",
+        "rules": {
+          "body": ["Otter Manager","channelList"]
+        }
+    }, {  
+        "name": "VMware vRealize Operations Manager",
+        "method": "get",
+        "rules": {
+          "body": ["vRealize","VMware","Identity Manager"]
+        }
+    }, {  
+        "name": "H3C-ER3200 路由器",
+        "method": "get",
+        "rules": {
+          "body": ["ER3200","home.asp","h3c.com"]
+        }
+    }, {  
+        "name": "安恒云堡垒机",
+        "method": "get",
+        "rules": {
+          "body": ["DBAPPSecurity","安恒云堡垒机"]
+        }
+    }, {  
+        "name": "Citrix 虚拟桌面",
+        "method": "get",
+        "rules": {
+          "favicon": -1272756243
+        }
+    }, {  
+        "name": "SeaweedFS",
+        "method": "get",
+        "rules": {
+          "favicon": 1210969935
+        }
+    }, {  
+        "name": "FreeRDP 远程RDP工具",
+        "method": "get",
+        "rules": {
+          "favicon": -2052468252
+        }
+    }, {  
+        "name": "Apache ActiveMQ",
+        "method": "get",
+        "rules": {
+          "favicon": 1766699363
+        }
+    }, {  
+        "name": "Apache-Skywalking",
+        "method": "get",
+        "rules": {
+          "favicon": 1929532064
+        }
+    }, {  
+        "name": "Parallels Default page",
+        "method": "get",
+        "rules": {
+          "favicon": -1050786453
+        }
+    }, {  
+        "name": "Plesk 面板",
+        "method": "get",
+        "rules": {
+          "favicon": -134375033
+        }
+    }, {  
+        "name": "DzzOffice 开源办公系统",
+        "method": "get",
+        "rules": {
+          "favicon": -1961736892
+        }
+    }, {  
+        "name": "网康科技网关/防火墙",
+        "method": "get",
+        "rules": {
+          "favicon": 5471989
+        }
+    }, {  
+        "name": "ThinkPHP",
+        "method": "get",
+        "rules": {
+          "header": ["ThinkPHP"]
+        }
+    }, {  
+        "name": "SuperMap iServer Web Manager",
+        "method": "get",
+        "rules": {
+          "favicon": 1740191553
+        }
+    }, {  
+        "name": "协众OA",
+        "method": "get",
+        "rules": {
+          "favicon": -1466673461
+        }
+    }, {  
+        "name": "Jellyfin",
+        "method": "get",
+        "rules": {
+          "favicon": -2069226242
+        }
+    }, {  
+        "name": "孚盟云 CRM",
+        "method": "get",
+        "rules": {
+          "favicon": 1533124028
+        }
+    }, {  
+        "name": "协众OA",
+        "method": "get",
+        "rules": {
+          "body": ["scripts/cnoa.extra.js"]
+        }
+    }, {  
+        "name": "FastAdmin 框架",
+        "method": "get",
+        "rules": {
+          "body": ["assets/img/favicon.ico","bootstrap.min.css","navbar-toggle"]
+        }
+    }, {  
+        "name": "FastAdmin 框架",
+        "method": "get",
+        "rules": {
+          "body": ["ajax\\/upload","assets/img/favicon.ico","fastadmin"]
+        }
+    }, {  
+        "name": "imo云办公室",
+        "method": "get",
+        "rules": {
+          "body": ["<a title=\"imo云办公室\""]
+        }
+    }, {  
+        "name": "imo云办公室",
+        "method": "get",
+        "rules": {
+          "body": ["高效率网上办公平台","imo_setup.exe"]
+        }
+    }, {  
+        "name": "永中DCS",
+        "method": "get",
+        "rules": {
+          "body": ["<title>永中文档在线预览DCS</title>","www.yozodcs.com"]
+        }
+    }, {  
+        "name": "JeecgBoot",
+        "method": "get",
+        "rules": {
+          "body": ["JeecgBoot","polyfill_"]
+        }
+    }, {  
+        "name": "帆软数据决策系统",
+        "method": "get",
+        "rules": {
+          "body": [">数据决策系统","ReportServer?op"]
+        }
+    }, {  
+        "name": "金山TimeOn云杀毒",
+        "method": "get",
+        "rules": {
+          "body": ["<title>TimeOn","iepngfix/iepngfix_tilebg.js"]
+        }
+    }, {  
+        "name": "金山终端安全",
+        "method": "get",
+        "rules": {
+          "body": ["终端安全系统","setup/kanclient.exe","iepngfix/iepngfix_tilebg.js"]
+     }
+    }, {  
+        "name": "微擎 - 公众平台自助引擎",
+        "method": "get",
+        "rules": {
+          "body": ["微擎 - 公众平台自助引擎","www.w7.cc","login"]
+     }
+    }, {  
+        "name": "Jspxcms",
+        "method": "get",
+        "rules": {
+          "body": ["- Powered by Jspxcms","template/"]
+     }
+    }, {  
+        "name": "WordPress",
+        "method": "get",
+        "rules": {
+          "body": ["wp-admin","wp-content/"]
+     }
+    }, {  
+        "name": "WordPress",
+        "method": "get",
+        "rules": {
+          "body": ["wp-","wp-content/themes/"]
+     }
+    }, {  
+        "name": "金合OA",
+        "method": "get",
+        "rules": {
+          "body": ["Jhsoft.Web.login","PassWord.aspx"]
+     }
+    }, {  
+        "name": "好视通视频会议系统",
+        "method": "get",
+        "rules": {
+          "body": ["用户登录","resources/commonImage/favicon.ico","login/createQRCode.do"]
+     }
+    }, {  
+        "name": "LANMP 默认页面",
+        "method": "get",
+        "rules": {
+          "body": ["<title>LANMP","<strong>恭喜","wdlinux.cn","本页可删除"]
+     }
+    }, {  
+        "name": "CentOS 默认页面",
+        "method": "get",
+        "rules": {
+          "body": ["<title>Welcome to CentOS</title>","img/centos-logo.png","centos.org"]
+     }
+    }, {  
+        "name": "百度 ueditor编辑器",
+        "method": "get",
+        "rules": {
+          "body": ["ueditor.all.js","UE.getEditor"]
+     }
+    }, {  
+        "name": "蓝凌EIS智慧协同平台",
+        "method": "get",
+        "rules": {
+          "body": ["/scripts/jquery.landray.common.js","蓝凌软件"]
+     }
+    }, {  
+        "name": "phpinfo",
+        "method": "get",
+        "rules": {
+          "body": ["<title>phpinfo","Virtual Directory Support"]
+     }
+    }, {  
+        "name": "Kyan 监控设备",
+        "method": "get",
+        "rules": {
+          "body": ["login_files","platform","欢迎登陆系统"]
+     }
+    }, {  
+        "name": "Hue 大数据框架",
+        "method": "get",
+        "rules": {
+          "body": ["Welcome to Hue","Query. Explore.","login"]
+     }
+    }, {  
+        "name": "亿邮邮件系统",
+        "method": "get",
+        "rules": {
+          "body": ["eYou","q=login","tpl/user"]
+     }
+    }, {  
+        "name": "网神下一代极速防火墙",
+        "method": "get",
+        "rules": {
+          "body": ["网神信息技术","login","防火墙"]
+     }
+    }, {  
+        "name": "中腾OA",
+        "method": "get",
+        "rules": {
+          "body": ["systemAction","zt_webframe","login"]
+     }
+    }, {  
+        "name": "TVT 公司产品",
+        "method": "get",
+        "rules": {
+          "favicon": 492290497
+     }
+    }, {  
+        "name": "资产灯塔系统",
+        "method": "get",
+        "rules": {
+          "favicon": 1708240621
+     }
+    }, {  
+        "name": "WinWebMail邮件系统",
+        "method": "get",
+        "rules": {
+          "body": ["images/hrefbt.css","WinWebMail"]
+        }
+     }]
+}
