@@ -594,7 +594,7 @@ pub enum ZoomeyePortInfo {
 
 #[derive(Deserialize)]
 pub struct ZoomeyeStringPortInfo {
-    pub port: String,       //智障zoomeye, 有些返回结果 port是string类型
+    pub port: String,       //zoomeye有些返回结果 port是string类型
     pub service: String,
     pub title: Option<Vec<String>>
 }
