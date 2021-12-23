@@ -67,11 +67,11 @@ impl QueryMatcher {
     }
     
     pub fn is_fofa(&self,s:&str)->bool {
-        self.fofa_regex.is_match(s) //|| self.fofa_regex2.is_match(s) || self.fofa_regex3.is_match(s)
+        self.fofa_regex.is_match(s)
     }
     
     pub fn is_zoomeye(&self,s:&str)->bool {
-        self.zoomeye_regex.is_match(s) //|| self.zoomeye_regex2.is_match(s)
+        self.zoomeye_regex.is_match(s)
     }
 }
 
