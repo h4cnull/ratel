@@ -151,7 +151,9 @@ pub fn fofa_search(run_mod:PassiveMod,searchs:Arc<Vec<String>>,fofa_sender:SyncS
         let (qbase64,ss) = if query {
             if query_matcher.is_zoomeye(search) {
                 //println!("{} is zoomeye",s); //////////////////////
-                continue;
+                if !query_matcher.is_fofa(search) {   
+                    continue;
+                }
             }
             //search string
             let ss = if query_matcher.is_ip(search) {
@@ -335,7 +337,9 @@ pub fn zoomeye_search(run_mod:PassiveMod,searchs:Arc<Vec<String>>,zoomeye_sender
         let (query_encoded,ss) = if query {
             if query_matcher.is_fofa(search) {
                 //println!("{} is fofa",s); //////////////////////
-                continue;
+                if !query_matcher.is_zoomeye(search) {   
+                    continue;
+                }
             }
             let ss = if query_matcher.is_ip(search) {
                 format!("ip:\"{}\"",search)
