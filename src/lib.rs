@@ -451,3 +451,63 @@ pub fn read_excludes(exclude_files:Vec<String>) -> Vec<String> {
     };
     return rst;
 }
+
+#[cfg(test)]
+mod tests {
+    use super::passive::QueryMatcher;
+    use regex::Regex;
+    #[test]
+    fn fofa_zoomeye() {
+        /*
+        let test1 = Regex::new("(?:&&)|(?:\\|\\|)").unwrap();
+        println!("&& {}",test1.is_match("&&"));
+        println!("|| {}",test1.is_match("||"));
+        let test2 = Regex::new("^.*?(?: (?:&&)|(?:\\|\\|) )?.*$").unwrap();
+        println!("' && ' {}",test2.is_match(" && "));
+        println!("' || ' {}",test2.is_match(" || "));
+        println!("m {}",test2.is_match("m"));
+        */
+        println!("fofa regex test...");
+        let fofa_regex = Regex::new("^.*?(?: (?:&&)|(?:\\|\\|) )?\\(?[a-zA-Z](?:==)|(?:!?=)\"?.*$").unwrap();
+        let s1 = "xxx country=\"CN\" region=\"HK\"";
+        let s2 = "title=xxx || xxx";
+        let s3 = "\"xxx\" title=\"xxx\"";
+        let s4 = "xxx || (domain=xxx && title=\"xxx\")";
+        println!("{} {}",s1,fofa_regex.is_match(s1));
+        println!("{} {}",s2,fofa_regex.is_match(s2));
+        println!("{} {}",s3,fofa_regex.is_match(s3));
+        println!("{} {}",s4,fofa_regex.is_match(s4));
+
+        println!("\nzoomeye regex test...");
+        let zoomeye_regex = Regex::new("^\\*|(?:.*[+-]?\\(?[a-zA-Z]+:\"?).*$").unwrap();
+        let s5 = "xxx domain:\"CN\"";
+        let s6 = "title:xxx -title:xxx";
+        let s7 = "\"xxx\"+title:\"xxx\"";
+        let s8 = "*xxx";
+        let s9 = "domain:xxx-(title:xxx+title:\"xxx\")";
+        
+        println!("{} {}",s5,zoomeye_regex.is_match(s5));
+        println!("{} {}",s6,zoomeye_regex.is_match(s6));
+        println!("{} {}",s7,zoomeye_regex.is_match(s7));
+        println!("{} {}",s8,zoomeye_regex.is_match(s8));
+        println!("{} {}",s9,zoomeye_regex.is_match(s9));
+
+        println!("\nfofa regex test zoomeye...");
+        println!("{} {}",s5,fofa_regex.is_match(s5));
+        println!("{} {}",s6,fofa_regex.is_match(s6));
+        println!("{} {}",s7,fofa_regex.is_match(s7));
+        println!("{} {}",s8,fofa_regex.is_match(s8));
+        println!("{} {}",s9,fofa_regex.is_match(s9));
+        
+        println!("\nzoomeye regex test fofa");
+        println!("{} {}",s1,zoomeye_regex.is_match(s1));
+        println!("{} {}",s2,zoomeye_regex.is_match(s2));
+        println!("{} {}",s3,zoomeye_regex.is_match(s3));
+        println!("{} {}",s4,zoomeye_regex.is_match(s4));
+        
+        println!("\nspace test");
+        let s10 = "xxx xxx xxx";
+        println!("fofa {} {}",s10,fofa_regex.is_match(s10));
+        println!("zoomeye {} {}",s10,zoomeye_regex.is_match(s10));
+    }
+}

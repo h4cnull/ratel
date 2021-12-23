@@ -39,10 +39,8 @@ pub struct QueryMatcher {
     domain_regex:Regex,
     ip_regex:Regex,
     cidr_regex:Regex,
-    fofa_regex1:Regex,
-    fofa_regex2:Regex,
-    zoomeye_regex1:Regex,
-    zoomeye_regex2:Regex
+    fofa_regex:Regex,
+    zoomeye_regex:Regex
 }
 
 impl QueryMatcher {
@@ -51,10 +49,8 @@ impl QueryMatcher {
             domain_regex: Regex::new("^(?:[a-zA-Z0-9][-a-zA-Z0-9]{0,62}\\.)+[a-zA-Z]+$").unwrap(),
             ip_regex: Regex::new("^((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))$").unwrap(),
             cidr_regex: Regex::new("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/[0-9]+$").unwrap(),
-            fofa_regex1: Regex::new("^[a-zA-Z]+=\".*$").unwrap(),
-            fofa_regex2: Regex::new("^[a-zA-Z]+==\".*$").unwrap(),
-            zoomeye_regex1: Regex::new("^[a-zA-Z]+:[\"]?.*$").unwrap(),
-            zoomeye_regex2: Regex::new("^\\*\".*\"").unwrap()
+            fofa_regex: Regex::new("^.*?(?: (?:&&)|(?:\\|\\|) )?\\(?[a-zA-Z](?:==)|(?:!?=)\"?.*$").unwrap(),
+            zoomeye_regex: Regex::new("^\\*|(?:.*[+-]?\\(?[a-zA-Z]+:\"?).*$").unwrap()
         }
     }
 
@@ -71,11 +67,11 @@ impl QueryMatcher {
     }
     
     pub fn is_fofa(&self,s:&str)->bool {
-        self.fofa_regex1.is_match(s) || self.fofa_regex2.is_match(s)
+        self.fofa_regex.is_match(s) //|| self.fofa_regex2.is_match(s) || self.fofa_regex3.is_match(s)
     }
     
     pub fn is_zoomeye(&self,s:&str)->bool {
-        self.zoomeye_regex1.is_match(s) || self.zoomeye_regex2.is_match(s)
+        self.zoomeye_regex.is_match(s) //|| self.zoomeye_regex2.is_match(s)
     }
 }
 
@@ -594,7 +590,7 @@ pub enum ZoomeyePortInfo {
 
 #[derive(Deserialize)]
 pub struct ZoomeyeStringPortInfo {
-    pub port: String,       //zoomeye有些返回结果 port是string类型
+    pub port: String,       //智障zoomeye, 有些返回结果 port是string类型
     pub service: String,
     pub title: Option<Vec<String>>
 }
