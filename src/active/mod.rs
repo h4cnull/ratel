@@ -16,7 +16,7 @@ pub struct Host {
 }
 
 pub struct TargetIter {
-    hosts: Vec<Host>,    //take value
+    hosts: Vec<Host>,
     hosts_index: usize,
     hosts_len: usize,
     cidr_iters: Vec<IpCidrIpAddrIterator>,
@@ -157,7 +157,7 @@ pub async fn scan_port(record:ActiveRecord,timeout:Duration,tries:u8) -> Option<
                     //输出非time out的错误
                     //if e.to_string().contains("future timed out") {
                     if e.to_string().to_lowercase().contains("too many open files") {
-                        eprintln!("Error: {} {}",socket_addr.to_string(),e.to_string());
+                        println!("[!] Active scan error: {} {}",socket_addr.to_string(),e.to_string());
                         //linux下错误中如果包含"too many open files", socket过多，提示减少limit数量，windows下错误信息待测。
                     }
                     break;

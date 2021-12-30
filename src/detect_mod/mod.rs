@@ -98,7 +98,7 @@ impl Detector {
                 let status_code = rsp.status().as_u16();
                 let header = self.get_raw_header(&rsp);
                 let url = rsp.url().to_string();
-                let body = rsp.text().await.unwrap_or_else(|e|{println!("{}",e);"".to_string()});
+                let body = rsp.text().await.unwrap_or_else(|_|{"".to_string()});
                 return Some((status_code,header,body,url));
             }
         }
@@ -109,8 +109,6 @@ impl Detector {
         if record.record_type() == Other {
             return None;
         }
-        //第一个请求是验证端口是不是http协议，用http_banner里面的async_http_get，然后初始化data
-        //启动协程，传入poc库匹配，匹配后得到poc名称，更新结果到data infos中。
         let cert_domains = record.cert_domains().unwrap_or_else(||{vec![]});
         let mut data = Data {   //初始化data, host/ip/port
             title: record.title().trim().to_string(),
@@ -389,9 +387,7 @@ impl Detector {
                 }
             };
         };
-
         //println!("header map {:?}",header_map);
-
         if method == "get" && ( path == "" || path == "/" ) {
             status_code = data.status_code;
         } else {    //否则就是非“/”请求，更新status_code，match_header，match_body

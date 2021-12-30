@@ -23,33 +23,6 @@ use umya_spreadsheet::{Font,Color};
 
 use ratel::RecordType::Other;
 
-//mod http_banner;
-//注意了，需要在crate root 引入mod，这样在finger子mod下面才能use super::http_finger::socket_get;其它mode的内容
-
-//mod detect_mod;
-//use detect_mod::Detector;
-
-//mod active;
-//use active::{Host,TargetIter,ActiveRecordIter,scan_port};
-
-//mod passive;
-//use passive::*;
-
-/*
-impl Message {
-    fn display(&self) {
-        match self {
-            Message::Content(r) => {
-                println!("Message: {:?} is {} record",r.record(),{if r.is_active() { "active"} else if r.is_other() { "other" } else { "passive" } });
-            },
-            Message::Finished => {
-                println!("Message is Finished");
-            }
-        }
-    }
-}
-*/
-
 fn passive(conf:PassiveConfig,result_sender:SyncSender<Message>) {
     if conf.searchs.len() == 0 {
         println!("[!] Passive search got nothing input");
@@ -112,8 +85,6 @@ fn passive(conf:PassiveConfig,result_sender:SyncSender<Message>) {
 }
 
 async fn active(conf:ActiveConfig,result_sender:SyncSender<Message>) {
-    println!("=> connect retries:      {}",conf.conn_retries);
-    println!("=> async scan limit:     {}",conf.async_scan_limit);
     let mut target_iter = TargetIter::new();
     let mut known_hosts = Vec::new();           //已知主机，只包含domain和ip，cidr不会包含
     let mut open_hosts = Vec::new();          //有开放端口的主机
@@ -482,14 +453,12 @@ _____________________________________Author: h4cnull__
 fn main() {
     println!("{}",BANNER);
     let (rst_config,conf) = get_config();
-    println!("=> connection timeout:   {}",rst_config.conn_timeout);
-    println!("=> write timeout:        {}",rst_config.write_timeout);
-    println!("=> read timeout:         {}",rst_config.read_timeout);
-    println!("=> poc enabled:          {}",!rst_config.disable_poc);
-    println!("=> pocs file:            {}",rst_config.pocs_file);
-    println!("=> redirect_times:       {}",rst_config.redirect_times);
-    println!("=> url requests limit:   {}",rst_config.poc_limit);
-    println!("=> output name:          {}",rst_config.output_file_name);
+    println!("=> {flag:<width$}{value}",flag="connection timeout(ms):",width=25,value=rst_config.conn_timeout);
+    println!("=> {flag:<width$}{value}",flag="poc enabled:",width=25,value=!rst_config.disable_poc);
+    println!("=> {flag:<width$}{value}",flag="pocs file:",width=25,value=rst_config.pocs_file);
+    println!("=> {flag:<width$}{value}",flag="redirect times:",width=25,value=rst_config.redirect_times);
+    println!("=> {flag:<width$}{value}",flag="max connections:",width=25,value=rst_config.poc_limit as usize*rst_config.detect_limit as usize+({match &conf {Config::Active(a)=>a.async_scan_limit as usize,_=>1}}));
+    println!("=> {flag:<width$}{value}",flag="output name:",width=25,value=rst_config.output_file_name);
     //println!("=> ip:port detect limit: {}",rst_config.detect_limit);
     let (result_sender,result_receiver) = mpsc::sync_channel::<Message>(rst_config.poc_limit as usize);
     let mut handlers = Vec::new();

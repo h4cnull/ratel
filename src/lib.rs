@@ -75,7 +75,7 @@ struct TomlConf {
     auto_web_filter: bool,
     passive_retries: u8,
     scanports: String,
-    async_scan_limit: usize,
+    async_scan_limit: u16,
     conn_timeout: u64,
     conn_retries: u8,
     write_timeout: u64,
@@ -111,7 +111,7 @@ pub struct PassiveConfig {
 pub struct ActiveConfig {
     pub targets: Vec<String>,
     pub exclude_files: Vec<String>,
-    pub async_scan_limit: usize,
+    pub async_scan_limit: u16,
     pub scan_ports: Vec<u16>,
     pub conn_timeout: u64,
     pub conn_retries: u8,
