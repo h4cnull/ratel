@@ -33,3 +33,9 @@ calamine = "0.18.0"
 
 [target.'cfg(unix)'.dependencies]
 rlimit = "0.6.2"
+
+[profile.release]
+panic = 'abort'
+lto = true
+opt-level = 'z'
+codegen-units = 1
