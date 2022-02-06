@@ -1,12 +1,11 @@
-use std::net::ToSocketAddrs;
+use std::net::{ToSocketAddrs,Shutdown};
+use std::time::Duration;
 use async_std::io;
 use async_std::net::TcpStream;
-use std::{
-    net::Shutdown,
-    time::Duration,
-};
-use num_bigint::{BigUint,ToBigUint};
+
+use cidr_utils::num_bigint::{BigUint,ToBigUint};
 use cidr_utils::cidr::{IpCidr,IpCidrIpAddrIterator};
+
 use super::ActiveRecord;
 
 #[derive(Clone)]
@@ -148,7 +147,7 @@ pub async fn scan_port(record:ActiveRecord,timeout:Duration,tries:u8) -> Option<
         try_num += 1;
         match io::timeout(timeout,async move { TcpStream::connect(socket_addr).await }).await {
             Ok(stream) => {
-                stream.shutdown(Shutdown::Both).unwrap_or_else(|_|{});
+                let _ = stream.shutdown(Shutdown::Both);
                 rst = Some(record);
                 break;
             },

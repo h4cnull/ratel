@@ -1,10 +1,12 @@
-use clap::{App, AppSettings, Arg, ErrorKind};
+
 use std::fs;
-use regex::Regex;
 use std::process::exit;
+
+use regex::Regex;
 use serde::Deserialize;
 use chrono::prelude::*;
 use rand::prelude::*;
+use clap::{App, AppSettings, Arg, ErrorKind};
 
 mod ports_parser;
 use ports_parser::PortsParser;
@@ -44,13 +46,13 @@ auto_web_filter = true  #搜索cidr时自动添加http过滤条件
 passive_retries = 3
 
 scanports = '80-89,443,444,555,666,777,888,999,1000-1100,6000-6100,6666,7000-7100,8000-8100,8800-8900,9000-9100,9999,10000-10100,20000-20100'
-async_scan_limit = 1000
+async_scan_limit = 1500
 
-conn_timeout = 2500     #millisecond
-conn_retries = 3        #主动扫描重试次数，确保可靠性
+conn_timeout = 3000     #millisecond
+conn_retries = 1        #主动扫描重试次数，确保可靠性
 write_timeout = 1500
 read_timeout = 3000
-redirect_times = 2      #跟随重定向次数, 0不重定向
+redirect_times = 1      #跟随重定向次数, 0不重定向
 
 pocs_json_path = '.\\pocs.json'
 detect_limit = 100   # 不同ip:port地址探测时的并发数量限制

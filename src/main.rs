@@ -1,26 +1,22 @@
-use std::time::Duration;
-use ratel::*;
-
 use std::fs;
 use std::io::Write;
 use std::thread;
+use std::time::Duration;
 use std::sync::{mpsc,Arc};
 use std::sync::mpsc::{Receiver, SyncSender};
 use std::collections::HashMap;
-
-use std::io::stdout;
-use std::io::BufWriter;
 
 use async_std::task::block_on;
 use futures::StreamExt;
 use futures::stream::FuturesUnordered;
 use dns_lookup::lookup_host;
 use cidr_utils::cidr::IpCidr;
-use num_bigint::ToBigUint;
+use cidr_utils::num_bigint::ToBigUint;
 
 use umya_spreadsheet::{self, Style};
 use umya_spreadsheet::{Font,Color};
 
+use ratel::*;
 use ratel::RecordType::Other;
 
 fn passive(conf:PassiveConfig,result_sender:SyncSender<Message>) {
@@ -203,6 +199,7 @@ use calamine::{Reader,Xlsx, open_workbook};
 async fn result_handler(rst_config:ResultConfig,receiver:Receiver<Message>) {
     let detector = Detector::new(&rst_config);
     let mut results:Vec<Data> = Vec::new();
+    let mut notices = Vec::new();
     let mut caches:HashMap<String,NoNeedCheckDataCache> = HashMap::new();  //{"host:port":cache} 最后和results合并
     let mut checked = String::with_capacity(1024*10);      //记录已经check的host:port
     let mut excludes = String::with_capacity(1024*20);     //记录排除的host:port
@@ -235,17 +232,10 @@ async fn result_handler(rst_config:ResultConfig,receiver:Receiver<Message>) {
             }
         };
     };
+
+    let mut total_push_ftrs = 0;
+    let mut total_wait_ftrs = 0;
     let mut ftrs  = FuturesUnordered::new();
-    let notice_path = &format!("{}_results_notice.txt",rst_config.output_file_name);
-    let mut other_f:BufWriter<Box<dyn Write>> = match fs::OpenOptions::new().create(true).write(true) .open(notice_path) {
-        Ok(f)=> {
-            BufWriter::new(Box::new(f))
-        },
-        Err(_) => {
-            println!("[!] Can not open result notice file {}! notice will be printed to stdout.",notice_path);
-            BufWriter::new(Box::new(stdout()))
-        }
-    };
     let mut ftrs_num = 0;
     let mut recv_finished = false;
     loop {
@@ -260,9 +250,7 @@ async fn result_handler(rst_config:ResultConfig,receiver:Receiver<Message>) {
                 Message::Content(mut record) => {
                     //去重处理！///////////////////////////////////////////////////////////////////////////////// 保留title
                     if record.record_type() == Other {
-                        let info = [record.record().unwrap().as_bytes(),b"\n"].concat();
-                        other_f.write(&info).unwrap_or_else(|_|{0});
-                        //把其它记录保存到其它结果中/////////////////////////
+                        notices.push(record);
                     } else { //active passive
                         let mut host_port = record.record().unwrap();
                         let protocol = record.protocol();
@@ -270,8 +258,6 @@ async fn result_handler(rst_config:ResultConfig,receiver:Receiver<Message>) {
                             host_port = format!("{}{}",protocol,host_port)
                         }
                         if excludes.contains(&host_port) {
-                            //let info = format!("in excludes: {} title?{}\n",host_port,record.title());
-                            //other_f.write(info.as_bytes()).unwrap_or_else(|_|{0});
                             continue;
                         } else {
                             if checked.contains(&host_port) {
@@ -294,6 +280,7 @@ async fn result_handler(rst_config:ResultConfig,receiver:Receiver<Message>) {
                                 checked.push_str(&(host_port+" "));
                                 ftrs.push(detector.detect(record));
                                 ftrs_num += 1;
+                                total_push_ftrs += 1; /////////////////////////////////
                             }
                         }
                     }
@@ -304,6 +291,7 @@ async fn result_handler(rst_config:ResultConfig,receiver:Receiver<Message>) {
                 }
             }
         } else {
+            recv_finished = true;
             break;
         }
     }
@@ -315,23 +303,23 @@ async fn result_handler(rst_config:ResultConfig,receiver:Receiver<Message>) {
             data.is_assets = is_assets(&rst_config,&data);
             results.push(data);
         }
+        total_wait_ftrs += 1; /////////////////////////////////
         if !recv_finished {
             if let Ok(m) = receiver.recv() {
                 match m {
                     Message::Content(mut record) => {
                         if record.record_type() == Other {
-                            let info = [record.record().unwrap().as_bytes(),b"\n"].concat();
-                            other_f.write(&info).unwrap_or_else(|_|{0});
-                            //把其它记录保存到其它结果中/////////////////////////
+                            notices.push(record);
+                            ftrs.push(detector.detect(Box::new(OtherRecord::new(OtherRecordInfo::Padding))));
+                            total_push_ftrs += 1; /////////////////////////////////
                         } else {
                             let mut host_port = record.record().unwrap();
                             let protocol = record.protocol();
                             if protocol == "http" || protocol == "https" {   //有的端口http https都可以访问，所以这里需要加上协议，否则可能跳过一些链接！
                                 host_port = format!("{}{}",protocol,host_port)
                             }
+                            total_push_ftrs += 1; /////////////////////////////////
                             if excludes.contains(&host_port) {
-                                //let info = format!("in excludes: {} title?{}\n",host_port,record.title());
-                                //other_f.write(info.as_bytes()).unwrap_or_else(|_|{0});
                                 ftrs.push(detector.detect(Box::new(OtherRecord::new(OtherRecordInfo::Padding))));  //需要push一个future 平衡futures和record的数量
                             } else {
                                 if checked.contains(&host_port) {
@@ -360,8 +348,6 @@ async fn result_handler(rst_config:ResultConfig,receiver:Receiver<Message>) {
                     },
                     Message::Finished => {
                         recv_finished = true;
-                        //println!("recv finished after limit"); //////////
-                        //break;  //这里不能break，record接收完了，还需要等待futures完成
                     }
                 }
             } else {
@@ -370,6 +356,7 @@ async fn result_handler(rst_config:ResultConfig,receiver:Receiver<Message>) {
         }
     }
     //println!("{:?}",caches);
+    println!("total push ftrs {},total wait ftrs {}",total_push_ftrs,total_wait_ftrs);
     for data in results.iter_mut() {
         let host_port = format!("{}:{}",data.host,data.port);
         if let Some(cache) = caches.get_mut(&host_port) {
@@ -382,10 +369,24 @@ async fn result_handler(rst_config:ResultConfig,receiver:Receiver<Message>) {
             }
         }
     }
+    if notices.len() > 0 {
+        let notice_path = &format!("{}_results_notice.txt",rst_config.output_file_name);
+        if let Ok(mut f) = fs::OpenOptions::new().create(true).write(true) .open(notice_path) {
+            for r in notices {
+                let info = [r.record().unwrap().as_bytes(),b"\n"].concat();
+                f.write(&info).unwrap();
+            }
+        } else {
+            println!("[!] Can not open result notice file {}! notice will be printed to stdout.",notice_path);
+            for r in notices {
+                println!("{}",r.record().unwrap());
+            }
+        }
+    };
     //结果保存到文件
     if results.len() > 0 {
         let result_path = &format!("{}_results.xlsx",rst_config.output_file_name);
-        println!("[-] Result saved in \"{}\",total {}.",result_path,results.len());
+        
         let mut book = umya_spreadsheet::new_file();
         let sheet1 = book.get_sheet_mut(0);
         //sheet1.set_title("Ratel Results");  //默认sheet1的名字就是Sheet1，因为这个crate在set_title时没有检查title，而是先检查title再set_title...
@@ -437,6 +438,7 @@ async fn result_handler(rst_config:ResultConfig,receiver:Receiver<Message>) {
                 println!("{:?}\n",d);
             }
         });
+        println!("[-] Result saved in \"{}\",total {}.",result_path,results.len());
     } else {
         println!("[!] No results found");
     }
@@ -457,7 +459,7 @@ fn main() {
     println!("=> {flag:<width$}{value}",flag="poc enabled:",width=25,value=!rst_config.disable_poc);
     println!("=> {flag:<width$}{value}",flag="pocs file:",width=25,value=rst_config.pocs_file);
     println!("=> {flag:<width$}{value}",flag="redirect times:",width=25,value=rst_config.redirect_times);
-    println!("=> {flag:<width$}{value}",flag="max connections:",width=25,value=rst_config.poc_limit as usize*rst_config.detect_limit as usize+({match &conf {Config::Active(a)=>a.async_scan_limit as usize,_=>1}}));
+    println!("=> {flag:<width$}{value}",flag="max connections:",width=25,value=rst_config.poc_limit as usize*rst_config.detect_limit as usize+({match &conf {Config::Active(a)=>a.async_scan_limit as usize,_=>2}}));
     println!("=> {flag:<width$}{value}",flag="output name:",width=25,value=rst_config.output_file_name);
     //println!("=> ip:port detect limit: {}",rst_config.detect_limit);
     let (result_sender,result_receiver) = mpsc::sync_channel::<Message>(rst_config.poc_limit as usize);

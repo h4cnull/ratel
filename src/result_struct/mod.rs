@@ -37,6 +37,7 @@ pub enum OtherRecordInfo {
     ErrorPage(String),
     BreakPage(String),
     FofaNoResult(String),
+    FofaSensitive(String),
     ZoomeyeNoResult(String),
     Padding
 }
@@ -57,6 +58,7 @@ pub static UNKNOWN_HOST:&'static str = "unknown host: ";
 pub static ERROR_PAGE:&'static str = "error page: ";
 pub static BREAK_PAGE:&'static str = "break page: ";
 pub static FOFA_NO_RESULT:&'static str = "fofa no result: ";
+pub static FOFA_SENSITIVE:&'static str = "fofa sensitive keyword: ";
 pub static ZOOMEYE_NO_RESULT:&'static str = "zoomeye no result: ";
 
 impl Record for OtherRecord {
@@ -67,6 +69,7 @@ impl Record for OtherRecord {
             OtherRecordInfo::ErrorPage(info) => Some(format!("{}{}",ERROR_PAGE,info)),
             OtherRecordInfo::BreakPage(info) => Some(format!("{}{}",BREAK_PAGE,info)),
             OtherRecordInfo::FofaNoResult(info) => Some(format!("{}{}",FOFA_NO_RESULT,info)),
+            OtherRecordInfo::FofaSensitive(info) => Some(format!("{}{}",FOFA_SENSITIVE,info)),
             OtherRecordInfo::ZoomeyeNoResult(info) => Some(format!("{}{}",ZOOMEYE_NO_RESULT,info)),
             OtherRecordInfo::Padding => None
         }

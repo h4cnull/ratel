@@ -1,24 +1,22 @@
-use std::time::Duration;
-use regex::Regex;
 use std::fs;
+use std::time::Duration;
+use std::str::FromStr;
+use std::io::Cursor;
 
+use regex::Regex;
 use futures::StreamExt;
 use futures::stream::FuturesUnordered;
-
 use reqwest;
-use std::str::FromStr;
 use reqwest::header::{HeaderMap,HeaderName,HeaderValue};
+use serde_json::Value;
+use base64;
+use murmur3::murmur3_32;
 
+use super::RecordType;
 use super::https_banner::USER_AGENT;
 use super::https_banner::*;
 use super::result_struct::{Record,Data,RecordType::*};
 use super::ResultConfig;
-
-use serde_json::Value;
-
-use base64;
-use murmur3::murmur3_32;
-use std::io::Cursor;
 
 pub struct Detector {
     server_regex: Regex,
@@ -127,28 +125,55 @@ impl Detector {
         let mut root_body_tmp = None;
         let mut current_url = None;
         //先处理Active记录
-        if record.record_type() == Active {
+        if record.record_type() == RecordType::Active {
             //如果是主动扫描结果，尝试将端口视为https http协议处理
-            if let Some(rst) = self.http_check(&format!("https://{}:{}",data.host,data.port), 0).await {
+            let url = format!("https://{}:{}",data.host,data.port);
+            if let Some(rst) = self.http_check(&url, 0).await {
+                data.url = Some(url);
                 data.status_code = rst.0;
                 data.protocol = "https".to_string();
                 root_header_tmp = Some(rst.1);
                 root_body_tmp = Some(rst.2);
                 current_url = Some(rst.3);
-            } else if let Some(rst) = self.http_check(&format!("http://{}:{}",data.host,data.port), 0).await {
-                data.status_code = rst.0;
-                data.protocol = "http".to_string();
-                root_header_tmp = Some(rst.1);
-                root_body_tmp = Some(rst.2);
-                current_url = Some(rst.3);
             } else {
-                data.protocol = "unknown".to_string();
+                let url = format!("http://{}:{}",data.host,data.port);
+                if let Some(rst) = self.http_check(&url, 0).await {
+                    data.url = Some(url);
+                    data.status_code = rst.0;
+                    data.protocol = "http".to_string();
+                    root_header_tmp = Some(rst.1);
+                    root_body_tmp = Some(rst.2);
+                    current_url = Some(rst.3);
+                } else {
+                    if data.port == 80 {
+                        data.protocol = "http".to_string();
+                        data.url = Some(format!("http://{}",data.host));
+                    }
+                    if data.port == 443 {
+                        data.protocol = "https".to_string();
+                        data.url = Some(format!("https://{}",data.host))
+                    } else {
+                        data.protocol = "unknown".to_string();
+                    }
+                }
+            }
+        } else {
+            if &data.protocol == "http" || &data.protocol == "https" {
+                data.url = Some(format!("{}://{}:{}",&data.protocol,&data.host,&data.port));
+                let url = (&data.url).as_ref().unwrap();
+                if let Some(rst) = self.http_check(url, 1).await {
+                    data.status_code = rst.0;
+                    root_header_tmp = Some(rst.1);
+                    root_body_tmp = Some(rst.2);
+                    current_url = Some(rst.3);
+                };
             }
         }
-        //如果是https 尝试获取证书
-        if &data.protocol == "https" {
-            if let Ok(cert) = get_cert(&data.host,data.port,self.conn_timeout,self.write_timeout,self.read_timeout).await {
-                if let Some(cert) = cert {
+        let mut infos = Vec::new();
+        let mut level = 0;
+        if data.status_code > 0 {
+            if &data.protocol == "https" {
+                if let Some(cert) = get_cert(&data.host,data.port,self.conn_timeout,self.write_timeout,self.read_timeout).await {
                     if let Ok(mut domains) = cert_parser(cert) {
                         for _ in 0..domains.len() {
                             let d = domains.pop().unwrap();
@@ -158,24 +183,11 @@ impl Detector {
                         }
                     };
                 }
-            }
-        };
-        let mut infos = Vec::new();
-        let mut level = 0;
-        if &data.protocol == "http" || &data.protocol == "https" {
-            data.url = Some(format!("{}://{}:{}",&data.protocol,&data.host,&data.port));
-            let url = (&data.url).as_ref().unwrap();
+            };
             //如果发生了重定向，url就不是根了，从重定向后的页面获取favicon地址，如果是../开头的相对地址，就需要当前url来定位favicon地址
-            if record.record_type() == Passive {
-                if let Some(rst) = self.http_check(url, 1).await {
-                    data.status_code = rst.0;
-                    root_header_tmp = Some(rst.1);
-                    root_body_tmp = Some(rst.2);
-                    current_url = Some(rst.3);
-                };
-            }
             //如果前面http请求成功了，再继续
             if root_header_tmp.is_some() && root_body_tmp.is_some() {
+                let root_url = data.url.as_ref().unwrap();
                 let root_header = root_header_tmp.unwrap();
                 let root_body = root_body_tmp.unwrap();
                 if let Some(caps) = self.server_regex.captures(&root_header) {
@@ -199,46 +211,43 @@ impl Detector {
                         }
                     };
                 };
-                let mut favicon_url = None;
-                if let Some(caps) = self.icon_regex.captures(&root_body) {
-                    if let Some(m) = caps.get(1) {
-                        let icon_html = m.as_str();
-                        //println!("favacion html {}",icon_html); //////////////////////////
-                        if let Some(caps) = self.icon_href_regex.captures(icon_html) {
-                            if let Some(m) = caps.get(1) {
-                                let tmp = m.as_str();
-                                if tmp.starts_with("http://") || tmp.starts_with("https://") {
-                                    favicon_url = Some(tmp.to_string());
-                                } else if tmp.starts_with("/") {
-                                    favicon_url = Some(url.to_string() + tmp)
-                                } else {  //否则就是../ ./ xxx/favicon.ico 这样的格式
-                                    let current_url = current_url.unwrap();
-                                    favicon_url = Some(current_url + "/" + tmp)
+                if !self.disable_poc { //如果开启了poc模块
+                    let mut favicon_url = None;
+                    if let Some(caps) = self.icon_regex.captures(&root_body) {
+                        if let Some(m) = caps.get(1) {
+                            let icon_html = m.as_str();
+                            //println!("favacion html {}",icon_html); //////////////////////////
+                            if let Some(caps) = self.icon_href_regex.captures(icon_html) {
+                                if let Some(m) = caps.get(1) {
+                                    let tmp = m.as_str();
+                                    if tmp.starts_with("http://") || tmp.starts_with("https://") {
+                                        favicon_url = Some(tmp.to_string());
+                                    } else if tmp.starts_with("/") {
+                                        favicon_url = Some(root_url.to_string() + tmp)
+                                    } else {  //否则就是../ ./ xxx/favicon.ico 这样的格式
+                                        let current_url = current_url.unwrap();
+                                        favicon_url = Some(current_url + "/" + tmp)
+                                    }
                                 }
                             }
-                        }
+                        };
                     };
-                };
-                if favicon_url.is_none() {   //如果favicon url没解析出来，则使用默认地址
-                    favicon_url = Some(url.to_string()+"/favicon.ico");
-                };
-                //计算favicon hash!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                /////println!("favicon url {:?}",favicon_url);                      //////////////
-                let favicon_hash = self.favicon_hash(&favicon_url.unwrap()).await;
-                /////println!("favicon hash {:?}",favicon_hash);
-                //println!("root header:\n{}",root_header);          ///////////////
-                //println!("root_body:\n{}",root_body);              ///////////////
-                if !self.disable_poc && data.status_code > 0 {       //如果开启了poc模块，并且目标可访问
+                    if favicon_url.is_none() {   //如果favicon url没解析出来，则使用默认地址
+                        favicon_url = Some(root_url.to_string()+"/favicon.ico");
+                    };
+                    //计算favicon hash!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    /////println!("favicon url {:?}",favicon_url);                      //////////////
+                    let favicon_hash = self.favicon_hash(&favicon_url.unwrap()).await;
                     let mut ftrs = FuturesUnordered::new();
                     let mut pocs_iter = self.pocs.iter();
                     for _ in 0..self.poc_limit {
                         if let Some(v) = pocs_iter.next() {
-                            ftrs.push(self.poc_matcher(&data,v,&root_header,&root_body,favicon_hash));
+                            ftrs.push(self.poc_matcher(v,root_url,data.status_code,&root_header,&root_body,favicon_hash));
                         }
                     }
                     while let Some(rst) = ftrs.next().await {
                         if let Some(v) = pocs_iter.next() {
-                            ftrs.push(self.poc_matcher(&data,v,&root_header,&root_body,favicon_hash));
+                            ftrs.push(self.poc_matcher(v,root_url,data.status_code,&root_header,&root_body,favicon_hash));
                         }
                         match rst {
                             Some(r) => {
@@ -256,9 +265,9 @@ impl Detector {
                             None => {}
                         } 
                     }
+                    data.level = level;
+                    data.infos = infos;
                 }
-                data.level = level;
-                data.infos = infos;
             }
         }
         Some(data)
@@ -279,7 +288,7 @@ impl Detector {
 
     fn unverify_client(&self) -> reqwest::Client {
         let cli = reqwest::ClientBuilder::new();
-        let cli1 = cli.connect_timeout(self.conn_timeout);
+        let cli1 = cli.connect_timeout(self.conn_timeout).timeout(self.conn_timeout+self.write_timeout+self.read_timeout);
         let policy = if self.redirect_times > 0 {
             reqwest::redirect::Policy::limited(self.redirect_times as usize) //最多跟随重定向2次
         } else {
@@ -293,7 +302,7 @@ impl Detector {
         cli3
     }
 
-    async fn poc_matcher(&self,data:&Data,v:&Value,root_header:&str,root_body:&str,favicon_hash:Option<i32>) -> Option<(String,u8)> {
+    async fn poc_matcher(&self,v:&Value,root_url:&str,root_status_code:u16,root_header:&str,root_body:&str,favicon_hash:Option<i32>) -> Option<(String,u8)> {
         let name = v.get("name");
         let level = v.get("level");
         let method = v.get("method");
@@ -364,7 +373,6 @@ impl Detector {
             return None;
         }
 
-        let url = format!("{}://{}:{}",data.protocol,data.host,data.port);
         let mut status_code = 0;
         let mut match_header = root_header;
         let mut match_header_not_root = "".to_string();
@@ -387,10 +395,14 @@ impl Detector {
                 }
             };
         };
-        //println!("header map {:?}",header_map);
         if method == "get" && ( path == "" || path == "/" ) {
-            status_code = data.status_code;
+            status_code = root_status_code;
         } else {    //否则就是非“/”请求，更新status_code，match_header，match_body
+            let url = if path.starts_with("/"){     //严重错误，之前版本没有添加path到url...
+                format!("{}{}",root_url,path)
+            } else {
+                format!("{}/{}",root_url,path)
+            };
             match method {
                 "get" => {
                     let req = client.get(&url).headers(header_map);

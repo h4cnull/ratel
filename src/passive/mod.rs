@@ -1,18 +1,16 @@
 use std::error::Error;
 use std::time::Duration;
+use std::sync::Arc;
+use std::sync::mpsc::{SyncSender};
+
 use reqwest::blocking::{Client,ClientBuilder,RequestBuilder};
 use regex::Regex;
+use serde_json::Value;
+use serde::Deserialize;
 
-//use Message;
 use super::result_struct::*;
 use super::Message;
 use super::https_banner::USER_AGENT;
-
-use serde_json::Value;
-use serde::Deserialize;
-use std::sync::Arc;
-
-use std::sync::mpsc::{SyncSender};
 
 #[derive(Deserialize)]
 pub struct FofaResult {
@@ -85,14 +83,14 @@ pub fn unverify_client(timeout:Duration)-> Client {
 }
 
 pub fn http_req(req:RequestBuilder)-> Result<String,Box<dyn Error>> {
-    //https://fofa.so/api/v1/search/all?email=%s&page=%d&size=%d&key=%s&qbase64=%s&fields=ip,host,title,port,protocol
+    //https://fofa.info/api/v1/search/all?email=%s&page=%d&size=%d&key=%s&qbase64=%s&fields=ip,host,title,port,protocol
     let content = req.send()?.text()?;
     Ok(content)
 }
 
 pub fn fofa_auth(fofa_email:&str,fofa_key:&str,fofa_timeout:Duration,fofa_delay:Duration)->bool {
     let cli = unverify_client(fofa_timeout);
-    let auth_url = format!("https://fofa.so/api/v1/info/my?email={}&key={}",fofa_email,fofa_key);
+    let auth_url = format!("https://fofa.info/api/v1/info/my?email={}&key={}",fofa_email,fofa_key);
     let mut auth_true = false;
     let mut err_msg = "[!] Fofa authentication max retries failed".to_string();
     for _ in 0..3 {
@@ -170,13 +168,13 @@ pub fn fofa_search(run_mod:PassiveMod,searchs:Arc<Vec<String>>,fofa_sender:SyncS
                 search.to_string()
             };
             (base64::encode(ss.as_bytes()),ss)
-            //format!("https://fofa.so/api/v1/search/all?email={}&key={}&size={}&qbase64={}&fields=ip,host,title,port,protocol",fofa_email,fofa_key,per_page_size,urlencoding::encode(&qbase64))    
+            //format!("https://fofa.info/api/v1/search/all?email={}&key={}&size={}&qbase64={}&fields=ip,host,title,port,protocol",fofa_email,fofa_key,per_page_size,urlencoding::encode(&qbase64))    
         } else {
-            if !search.contains("https://fofa.so/") {
+            if !search.contains("https://fofa.info/") {
                 continue;
             } else if search.starts_with(ERROR_PAGE) {
                 to_the_end = false;
-                let tmp = &search.as_str()[ERROR_PAGE.len()..];   //https://fofa.so/api......
+                let tmp = &search.as_str()[ERROR_PAGE.len()..];   //https://fofa.info/api......
                 let tmp = tmp.split(" ").collect::<Vec<&str>>()[0];   //url
                 let tmp = tmp.split("&page=").collect::<Vec<&str>>();
                 start_page = tmp[1].parse().unwrap();  //page
@@ -186,7 +184,7 @@ pub fn fofa_search(run_mod:PassiveMod,searchs:Arc<Vec<String>>,fofa_sender:SyncS
                 (qbase64,ss)
             } else if search.starts_with(BREAK_PAGE) {
                 to_the_end = true;
-                let tmp = &search.as_str()[BREAK_PAGE.len()..];   //https://fofa.so/api......
+                let tmp = &search.as_str()[BREAK_PAGE.len()..];   //https://fofa.info/api......
                 let tmp = tmp.split(" ").collect::<Vec<&str>>()[0];  //url
                 let tmp = tmp.split("&page=").collect::<Vec<&str>>();
                 start_page = tmp[1].parse().unwrap();  //page
@@ -202,7 +200,7 @@ pub fn fofa_search(run_mod:PassiveMod,searchs:Arc<Vec<String>>,fofa_sender:SyncS
         let mut page_step = 0;
         loop {
             let page = start_page + page_step;
-            let url = format!("https://fofa.so/api/v1/search/all?email={}&key={}&size={}&fields=ip,host,title,port,protocol&qbase64={}&page={}",fofa_email,fofa_key,per_page_size,urlencoding::encode(&qbase64),page); //format!("{}&page={}",qurl,page);
+            let url = format!("https://fofa.info/api/v1/search/all?email={}&key={}&size={}&fields=ip,host,title,port,protocol&qbase64={}&page={}",fofa_email,fofa_key,per_page_size,urlencoding::encode(&qbase64),page); //format!("{}&page={}",qurl,page);
             //println!("{}",url);         ///////////////////////////////////////////////////////////////
             if !auth_true {
                 fofa_sender.send(Message::Content(Box::new(
@@ -217,6 +215,11 @@ pub fn fofa_search(run_mod:PassiveMod,searchs:Arc<Vec<String>>,fofa_sender:SyncS
                             println!("[-] Fofa search {} total results {}",ss,rst.size);
                             if rst.size == 0 {
                                 fofa_sender.send(Message::Content(Box::new(OtherRecord::new(OtherRecordInfo::FofaNoResult(ss))))).unwrap();
+                                break;
+                            }
+                            if rst.size > 0 && rst.results.len() == 0 {
+                                println!("[!] Fofa search {} contains sensitive keyword, no results!",ss);
+                                fofa_sender.send(Message::Content(Box::new(OtherRecord::new(OtherRecordInfo::FofaSensitive(ss))))).unwrap();
                                 break;
                             }
                         }

@@ -26,7 +26,6 @@ base64 = "0.13"
 murmur3 = "0.5.1"
 chrono = "0.4.19"
 rand = "0.8.4"
-num-bigint = "0.4.3"
 urlencoding = "1.0.0"
 umya-spreadsheet = "0.4.0"   #reader has a bug
 calamine = "0.18.0"

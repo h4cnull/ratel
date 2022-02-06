@@ -1,40 +1,46 @@
-use async_std::io;
-use async_std::net::TcpStream;
 use std::time::Duration;
-use async_native_tls::Certificate;
-use async_native_tls::TlsConnector;
-use tokio::time::timeout;
 use std::net::ToSocketAddrs;
 use std::net::SocketAddr;
 use std::error::Error;
+
+use async_std::io;
+use async_std::net::TcpStream;
+use async_native_tls::Certificate;
+use async_native_tls::TlsConnector;
 use x509_parser::prelude::*;
 
 pub static USER_AGENT:&'static str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36";
 
-async fn async_tcp_stream(addr: SocketAddr,timeout:Duration) -> io::Result<TcpStream> {
-    //println!("connectting to {}",addr);
-    let stream = io::timeout(
-        timeout,
-        async move { TcpStream::connect(addr).await },
-    )
-    .await?;
-    Ok(stream)
+async fn async_tcp_stream(addr: &SocketAddr,timeout:Duration,retries:u8) -> Option<TcpStream> {
+    for _ in 0..=retries {
+        if let Ok(stream) = io::timeout(timeout,TcpStream::connect(addr)).await {
+            return Some(stream);
+        }
+    }
+    return None;
 }
 
-pub async fn get_cert(host:&str,port:u16,conn_timeout:Duration,write_timeout:Duration,read_timeout:Duration)-> Result<Option<Certificate>,Box<dyn Error>> {
+pub async fn get_cert(host:&str,port:u16,conn_timeout:Duration,write_timeout:Duration,read_timeout:Duration)-> Option<Certificate> {
     let addr = format!("{}:{}",host,port);
-    let mut socket_addrs = addr.to_socket_addrs()?;
-    let socket_addr = socket_addrs.next().unwrap();
-    let stream = async_tcp_stream(socket_addr, conn_timeout).await?;
-    let connector = TlsConnector::new();
-    let connector = connector.danger_accept_invalid_certs(true);
-    let stream= timeout(write_timeout+read_timeout,connector.connect(host, stream)).await??;
-    let cert = if let Ok(cert) = stream.peer_certificate() {
-        cert
-    } else {
-        None
+    if let Ok(mut socket_addrs) = addr.to_socket_addrs() {
+        let socket_addr = socket_addrs.next().unwrap();
+        if let Some(stream) = async_tcp_stream(&socket_addr, conn_timeout,1).await {
+            let connector = TlsConnector::new();
+            let connector = connector.danger_accept_invalid_certs(true);
+            if let Ok(stream) = io::timeout(write_timeout+read_timeout,async {
+                if let Ok(s) = connector.connect(host, stream).await {
+                    return Ok(s);
+                } else {
+                    return Err(io::Error::new(io::ErrorKind::Other, ""));
+                }
+            }).await {
+                if let Ok(cert) = stream.peer_certificate() {
+                    return cert;
+                }
+            };
+        };
     };
-    return Ok(cert);
+    return None;
 }
 
 pub fn cert_parser(cert:async_native_tls::Certificate) -> Result<Vec<String>,Box<dyn Error>> {
@@ -58,3 +64,45 @@ pub fn cert_parser(cert:async_native_tls::Certificate) -> Result<Vec<String>,Box
         None => { Ok(vec![]) }
     }
 }
+
+/*
+pub async fn http_banner_check(host:&str,port:u16,conn_timeout:Duration,write_timeout:Duration,read_timeout:Duration)-> Option<(&'static str,Option<Certificate>)> {
+    let addr = format!("{}:{}",host,port);
+    if let Ok(mut socket_addrs) = addr.to_socket_addrs() {
+        let socket_addr = socket_addrs.next().unwrap();
+        if let Some(stream) = async_tcp_stream(&socket_addr, conn_timeout,1).await {
+            let req = format!("GET / HTTP/1.1\r\nHost: {}\r\nUser-Agent: {}\r\nConnection: close\r\n\r\n",host,USER_AGENT);
+            let connector = TlsConnector::new();
+            let connector = connector.danger_accept_invalid_certs(true);
+            if let Ok(mut stream) = io::timeout(write_timeout+read_timeout,async {
+                if let Ok(s) = connector.connect(host, stream).await {
+                    return Ok(s);
+                } else {
+                    return Err(io::Error::new(io::ErrorKind::Other, ""));
+                }
+            }).await {
+                let _ = io::timeout(write_timeout,stream.write_all(req.as_bytes())).await;
+                let mut buf = [0;100];
+                async_std::task::sleep(std::time::Duration::from_millis(500)).await;
+                let _ = io::timeout(read_timeout,stream.read(&mut buf)).await;
+                if buf.starts_with(b"HTTP/") {
+                    let cert = stream.peer_certificate().unwrap_or_else(|_|{ None } );
+                    return Some(("https",cert));
+                }
+            } else {
+                if let Some(mut stream) = async_tcp_stream(&socket_addr, conn_timeout,1).await {
+                    let _ = io::timeout(write_timeout,stream.write_all(req.as_bytes())).await;
+                    let mut buf = [0;100];
+                    async_std::task::sleep(std::time::Duration::from_millis(500)).await;
+                    let _ = io::timeout(read_timeout,stream.read(&mut buf)).await;
+                    let _ = stream.shutdown(std::net::Shutdown::Both);
+                    if buf.starts_with(b"HTTP/") {
+                        return Some(("http",None));
+                    }
+                };
+            }
+        };
+    };
+    return None;
+}
+ */
