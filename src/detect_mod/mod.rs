@@ -127,14 +127,26 @@ impl Detector {
         //先处理Active记录
         if record.record_type() == RecordType::Active {
             //如果是主动扫描结果，尝试将端口视为https http协议处理
-            let url = format!("https://{}:{}",data.host,data.port);
-            if let Some(rst) = self.http_check(&url, 0).await {
+            if data.port == 80 {
+                data.protocol = "http".to_string();
+                let url = format!("http://{}",data.host);
+                if let Some(rst) = self.http_check(&url, 0).await {
+                    data.status_code = rst.0;
+                    root_header_tmp = Some(rst.1);
+                    root_body_tmp = Some(rst.2);
+                    current_url = Some(rst.3);
+                }
                 data.url = Some(url);
-                data.status_code = rst.0;
+            } else if data.port == 443 {
                 data.protocol = "https".to_string();
-                root_header_tmp = Some(rst.1);
-                root_body_tmp = Some(rst.2);
-                current_url = Some(rst.3);
+                let url = format!("https://{}",data.host);
+                if let Some(rst) = self.http_check(&url, 0).await {
+                    data.status_code = rst.0;
+                    root_header_tmp = Some(rst.1);
+                    root_body_tmp = Some(rst.2);
+                    current_url = Some(rst.3);
+                }
+                data.url = Some(url);
             } else {
                 let url = format!("http://{}:{}",data.host,data.port);
                 if let Some(rst) = self.http_check(&url, 0).await {
@@ -145,13 +157,14 @@ impl Detector {
                     root_body_tmp = Some(rst.2);
                     current_url = Some(rst.3);
                 } else {
-                    if data.port == 80 {
-                        data.protocol = "http".to_string();
-                        data.url = Some(format!("http://{}",data.host));
-                    }
-                    if data.port == 443 {
+                    let url = format!("https://{}:{}",data.host,data.port);
+                    if let Some(rst) = self.http_check(&url, 0).await {
+                        data.url = Some(url);
+                        data.status_code = rst.0;
                         data.protocol = "https".to_string();
-                        data.url = Some(format!("https://{}",data.host))
+                        root_header_tmp = Some(rst.1);
+                        root_body_tmp = Some(rst.2);
+                        current_url = Some(rst.3);
                     } else {
                         data.protocol = "unknown".to_string();
                     }

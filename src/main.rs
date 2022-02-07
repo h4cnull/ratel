@@ -151,7 +151,7 @@ async fn active(conf:ActiveConfig,result_sender:SyncSender<Message>) {
     for h in known_hosts.iter() {
         if !open_hosts.contains(&h.host) {
             result_sender.send(Message::Content(Box::new(
-                OtherRecord::new(OtherRecordInfo::NoOpenPort(format!("{} {}",h.host,h.ip)))
+                OtherRecord::new(OtherRecordInfo::NoOpenPort(format!("{}",h.host)))
             ))).unwrap();
         }
     }
@@ -194,8 +194,6 @@ fn is_assets(rst_config:&ResultConfig,data:&Data) -> bool {
     return false;
 }
 
-use calamine::{Reader,Xlsx, open_workbook};
-
 async fn result_handler(rst_config:ResultConfig,receiver:Receiver<Message>) {
     let detector = Detector::new(&rst_config);
     let mut results:Vec<Data> = Vec::new();
@@ -204,26 +202,31 @@ async fn result_handler(rst_config:ResultConfig,receiver:Receiver<Message>) {
     let mut checked = String::with_capacity(1024*10);      //记录已经check的host:port
     let mut excludes = String::with_capacity(1024*20);     //记录排除的host:port
     for ef in  rst_config.poc_exclude_files.iter() {
-        let excel: Result<Xlsx<_>,_> = open_workbook(ef);
-        match excel {
-            Ok(mut sheet1) => {
-                if let Some(Ok(r)) = sheet1.worksheet_range("Sheet1") {
-                    for row in r.rows() {
-                        if row.len() >= 4 {
-                            //println!("{:?}",row);
-                            if let Some(host) = row[1].get_string() {
-                                if let Some(port) = row[3].get_float() {
-                                    if let Some(protocol) = row[4].get_string() {
-                                        let mut host_port = format!("{}:{}",host,port as u16);
-                                        //println!("{}",host_port);
-                                        if protocol == "http" || protocol == "https" {   //有的端口http https都可以访问，所以这里需要加上协议，否则可能跳过一些链接！
-                                            host_port = format!("{}{} ",row[4],host_port)
-                                        }
-                                        excludes.push_str(&host_port);
-                                    }
+        let path = std::path::Path::new(&ef);
+        let book = umya_spreadsheet::reader::xlsx::read(path);
+        match book {
+            Ok(sheet1) => {
+                if let Ok(r) = sheet1.get_sheet_by_name("Sheet1") {
+                    let mut index = 2;
+                    //col - Specify the column number. (first column number is 1)
+                    //row - Specify the row number. (first row number is 1)
+                    loop {
+                        let host = r.get_cell_by_column_and_row(2, index);
+                        let port = r.get_cell_by_column_and_row(4, index);
+                        let protocol = r.get_cell_by_column_and_row(5, index);
+                        if host.is_some() && port.is_some() {
+                            let mut host_port = format!("{}:{} ",host.unwrap().get_value(),port.unwrap().get_value());
+                            if protocol.is_some() {
+                                let protocol =  protocol.unwrap().get_value();
+                                if protocol == "http" || protocol == "https" {   //有的端口http https都可以访问，所以这里需要加上协议，否则可能跳过一些链接！
+                                    host_port = format!("{}{}",protocol,host_port)
                                 }
                             }
-                        }
+                            excludes.push_str(&host_port);
+                        } else {
+                            break;
+                        };
+                        index += 1;
                     }
                 }
             },
@@ -233,8 +236,6 @@ async fn result_handler(rst_config:ResultConfig,receiver:Receiver<Message>) {
         };
     };
 
-    let mut total_push_ftrs = 0;
-    let mut total_wait_ftrs = 0;
     let mut ftrs  = FuturesUnordered::new();
     let mut ftrs_num = 0;
     let mut recv_finished = false;
@@ -280,7 +281,6 @@ async fn result_handler(rst_config:ResultConfig,receiver:Receiver<Message>) {
                                 checked.push_str(&(host_port+" "));
                                 ftrs.push(detector.detect(record));
                                 ftrs_num += 1;
-                                total_push_ftrs += 1; /////////////////////////////////
                             }
                         }
                     }
@@ -298,12 +298,11 @@ async fn result_handler(rst_config:ResultConfig,receiver:Receiver<Message>) {
     while let Some(data) = ftrs.next().await {  //注意了 等待一个future完成，则接收一个record，如果这个record没有push到futures中！，那么实际上futures会比record少，这时futures执行完了，record可能还没发送完，就会出现bug!
         if let Some(mut data) = data {
             if data.level >= rst_config.print_level && data.status_code > 0 {
-                println!("[+] {}://{}:{} [{}] [{}] {:?}",data.protocol,data.host,data.port,data.title,data.status_code,data.infos);
+                println!("[+] Found {}://{}:{} [{}] [{}] {:?}",data.protocol,data.host,data.port,data.status_code,data.title,data.infos);
             }
             data.is_assets = is_assets(&rst_config,&data);
             results.push(data);
         }
-        total_wait_ftrs += 1; /////////////////////////////////
         if !recv_finished {
             if let Ok(m) = receiver.recv() {
                 match m {
@@ -311,14 +310,12 @@ async fn result_handler(rst_config:ResultConfig,receiver:Receiver<Message>) {
                         if record.record_type() == Other {
                             notices.push(record);
                             ftrs.push(detector.detect(Box::new(OtherRecord::new(OtherRecordInfo::Padding))));
-                            total_push_ftrs += 1; /////////////////////////////////
                         } else {
                             let mut host_port = record.record().unwrap();
                             let protocol = record.protocol();
                             if protocol == "http" || protocol == "https" {   //有的端口http https都可以访问，所以这里需要加上协议，否则可能跳过一些链接！
                                 host_port = format!("{}{}",protocol,host_port)
                             }
-                            total_push_ftrs += 1; /////////////////////////////////
                             if excludes.contains(&host_port) {
                                 ftrs.push(detector.detect(Box::new(OtherRecord::new(OtherRecordInfo::Padding))));  //需要push一个future 平衡futures和record的数量
                             } else {
@@ -356,7 +353,6 @@ async fn result_handler(rst_config:ResultConfig,receiver:Receiver<Message>) {
         }
     }
     //println!("{:?}",caches);
-    println!("total push ftrs {},total wait ftrs {}",total_push_ftrs,total_wait_ftrs);
     for data in results.iter_mut() {
         let host_port = format!("{}:{}",data.host,data.port);
         if let Some(cache) = caches.get_mut(&host_port) {
@@ -386,7 +382,6 @@ async fn result_handler(rst_config:ResultConfig,receiver:Receiver<Message>) {
     //结果保存到文件
     if results.len() > 0 {
         let result_path = &format!("{}_results.xlsx",rst_config.output_file_name);
-        
         let mut book = umya_spreadsheet::new_file();
         let sheet1 = book.get_sheet_mut(0);
         //sheet1.set_title("Ratel Results");  //默认sheet1的名字就是Sheet1，因为这个crate在set_title时没有检查title，而是先检查title再set_title...
