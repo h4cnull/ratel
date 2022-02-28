@@ -30,15 +30,15 @@
   "pocs": [
     {
       "name": "multi request poc",   //必须指定
-	  "author": "h4cnull",
-	  "level": "poc level",          //u8类型：0-255，指示该poc的级别，非必须，默认1。结合config中的print_level，可以在运行时只打印重要的信息。
+      "author": "h4cnull",
+      "level": "poc level",          //u8类型：0-255，指示该poc的级别，非必须，默认1。结合config中的print_level，可以在运行时只打印重要的信息。
       "requests": [                  //请求列表，必须
         {                            //请求中的字段都是非必须
           "path_args": "/$HOST$"     //请求路径和参数，非必须，默认 /，$HOST$是特殊变量，值为当前请求的host(ip或域名)。使用该变量方便进行大量OOB测试时区分漏洞主机。
         },
         {
-		  "method":"GET",            //请求方法，非必须，默认 GET，还支持POST HEAD DELETE PATCH OPTIONS TRACE方法
-		  "path_args": "/test.txt",
+          "method":"GET",            //请求方法，非必须，默认 GET，还支持POST HEAD DELETE PATCH OPTIONS TRACE方法
+          "path_args": "/test.txt",
           "variables_regex": "token=\"(.*?)\" id=\"(.*?)\".*?(regex2)",  //匹配响应内容的正则表达式
           "regex_dot_all": true, // .是否匹配所有字符
           "variables_group": [["$token$",1],["$id$",2],["Variable3",3]], //用在后续请求的变量，以及变量在正则表达式中的分组。
@@ -50,23 +50,23 @@
         {
           "path_args": "/req3/$id$/Variable3?token=$token$", //变量可以设置在path_args,headers,req_body。
           "method": "POST",
-		  "headers": {"Cookie": "token=$token$"},
+          "headers": {"Cookie": "token=$token$"},
           "req_body": "id=$id$",
           "rules": {
             "status_code": 501
           }
         },
-		{
+	{
           "path_args": "/$id$/",  //变量可以一直使用，可用新的正则表达式匹配更新变量值
-		  "rules": {
+	  "rules": {
             "header":["x1","x2"], //status_code，header，body，favicon，它们之间为“与”关系。body和header是关键词列表，关键词之间也是“与”关系。
-			"body":["x3"],
-			"favicon": -113918534
+	    "body":["x3"],
+	    "favicon": -113918534
           }
         }
       ]
     },
-	...
+    ...
   ]
 }
 ```
