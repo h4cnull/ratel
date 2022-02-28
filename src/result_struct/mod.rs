@@ -202,6 +202,7 @@ pub struct Data {             //最终结果
     pub status_code: u16,     //http status code，存在则说明可访问
     pub cert_domains: Vec<String>,
     pub is_assets: bool,      //明确的资产
+    pub favicon:Option<i32>,
     pub level: u8,            //级别
 }
 
@@ -218,18 +219,57 @@ pub enum CellType<'a> {
     Boolean(bool)
 }
 
-use CellType::*;
+use csv::{Writer,Reader};
+use std::error::Error;
 
-pub fn data_to_list(data:&Data)->Vec<CellType<'_>> {
-    vec![Str(data.title.as_str()),
-    Str(data.host.as_str()),
-    Str(data.ip.as_str()),
-    Num(data.port),
-    Str(data.protocol.as_str()),
-    Str(data.url.as_ref().map(|s|{s.as_str()}).unwrap_or_else(||{""})),
-    Strin(format!("{:?}",data.infos)),
-    Num(data.status_code),
-    Strin(format!("{:?}",data.cert_domains)),
-    Boolean(data.is_assets),
-    Num(data.level as u16)]
+pub static RST_COLS:&[&str] = &["title","host","ip","port","protocol","url","status code","infos","cert domains","is_assets","favicon","level"];
+
+pub fn write_data_to_csv(wtr:&mut Writer<Vec<u8>>,data:&Data)->Result<(),Box<dyn Error>> {
+    wtr.write_field(&data.title)?;
+    wtr.write_field(&data.host).unwrap();
+    wtr.write_field(&data.ip).unwrap();
+    wtr.write_field(data.port.to_string()).unwrap();
+    wtr.write_field(&data.protocol).unwrap();
+    wtr.write_field(if data.url.is_some() { data.url.as_ref().unwrap() } else {""}).unwrap();
+    wtr.write_field(&data.status_code.to_string()).unwrap();
+    wtr.write_field(&format!("{:?}",data.infos)).unwrap();
+    wtr.write_field(&format!("{:?}",data.cert_domains)).unwrap();
+    wtr.write_field(&data.is_assets.to_string()).unwrap();
+    wtr.write_field( if data.favicon.is_some() {data.favicon.unwrap().to_string() } else { String::new() }).unwrap();
+    wtr.write_field(&data.level.to_string()).unwrap();
+    wtr.write_record(None::<&[u8]>).unwrap();
+    wtr.flush().unwrap();
+    Ok(())
+}
+
+pub fn read_csv_to_excludes(excludes:&mut String,ef:&str) {
+    let csv_reader = Reader::from_path(&ef);
+    match csv_reader {
+        Ok(mut reader) => {
+            let mut line_num = 1;
+            for result in reader.records() {
+                if line_num == 1 {
+                    line_num += 1;
+                    continue;
+                }
+                if let Ok(record) = result {
+                    let items = record.iter().collect::<Vec<&str>>();
+                    if items.len() >= 5 {
+                        let mut host_port = format!("{}:{} ",items[1],items[3]);
+                        let protocol = items[4];
+                        if protocol == "http" || protocol == "https" {       //有的端口http https都可以访问，所以这里需要加上协议，否则可能跳过一些链接！
+                            host_port = format!("{}{}",protocol,host_port)
+                        }
+                        excludes.push_str(&host_port);
+                    }
+                }
+                // else {
+                //    println!("Read exclude file {} line {}  error.",ef,line_num);
+                //};
+            }
+        },
+        Err(e) => {
+            println!("[!] Read exclude file {} error:{:?}.",ef,e.kind());
+        }
+    };
 }

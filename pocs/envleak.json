@@ -1,0 +1,25 @@
+{
+    "pocs":[
+        {
+            "name":"env root",
+            "requests":[
+                {
+                    "rules":{
+                        "body":["APP_ENV="]
+                    }
+                }
+            ]
+        },
+        {
+            "name":"env /.env",
+            "requests":[
+                {
+                    "path_args":"/.env",
+                    "rules":{
+                        "body":["APP_ENV="]
+                    }
+                }
+            ]
+        }
+    ]
+}

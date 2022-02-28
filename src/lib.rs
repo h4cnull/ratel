@@ -14,8 +14,8 @@ use ports_parser::PortsParser;
 mod passive;
 pub use passive::*;
 
-mod https_banner;
-pub use https_banner::*;
+mod http_banner;
+pub use http_banner::*;
 
 mod result_struct;
 pub use result_struct::*;
@@ -45,21 +45,23 @@ zoomeye_delay = 2   #second
 auto_web_filter = true  #搜索cidr时自动添加http过滤条件
 passive_retries = 3
 
-scanports = '80-89,443,444,555,666,777,888,999,1000-1100,6000-6100,6666,7000-7100,8000-8100,8800-8900,9000-9100,9999,10000-10100,20000-20100'
-async_scan_limit = 1500
+default_scanports = '80-89,443,666,888,1000-1010,6000-6010,6666,7000-7010,8000-8100,8800-8890,9000-9010,9999,60000-60001,65535'
+async_scan_limit = 800
 
-conn_timeout = 3000     #millisecond
+conn_timeout = 2500     #millisecond
 conn_retries = 1        #主动扫描重试次数，确保可靠性
-write_timeout = 1500
-read_timeout = 3000
-redirect_times = 1      #跟随重定向次数, 0不重定向
 
-pocs_json_path = '.\\pocs.json'
-detect_limit = 100   # 不同ip:port地址探测时的并发数量限制
-poc_limit = 10       # 对某个url进行poc验证时的并发数量限制，过高的数量可能被waf封锁
-#注意limit值过高会超过io瓶颈，影响准确性，默认100*10，并发不超过1000，如果是主动扫描，则并发不会超过1000+1000(async_scan_limit)，在linux下可能会出现too many open files!。
+http_timeout = 15        #second
+follow_redirect = true   #仅影响http banner探测时是否跟随重定向。
 
-print_level = 0   #输出级别，默认0，全部打印。poc的level字段可设置该poc的级别，不设置则为0";
+default_pocs_json_path = 'fingers.json'
+detect_limit = 100       # 不同ip:port地址探测时的并发数量限制
+per_url_limit = 10       # 每个url进行poc验证时的并发数量限制，过高的数量可能被waf封锁
+
+#注意limit值过高会超过io瓶颈，影响准确性，http探测默认100*10，探测并发不超过1000。在linux下值过高可能会出现too many open files!，需更改linux配置。
+
+print_level = 1         #打印级别，默认结果为0，不打印。poc的level默认1。
+output_encode = 'gbk'   #utf-8 windows-1250 iso-8859-16 etc...";
 
 #[derive(Deserialize)]
 struct TomlConf {
@@ -76,17 +78,17 @@ struct TomlConf {
     zoomeye_delay: u8,
     auto_web_filter: bool,
     passive_retries: u8,
-    scanports: String,
+    default_scanports: String,
     async_scan_limit: u16,
     conn_timeout: u64,
     conn_retries: u8,
-    write_timeout: u64,
-    read_timeout: u64,
-    redirect_times: u8,
-    pocs_json_path: String,
+    http_timeout: u64,
+    follow_redirect: bool,
+    default_pocs_json_path: String,
     detect_limit: u16,
-    poc_limit: u16,
-    print_level: u8
+    per_url_limit: u16,
+    print_level: u8,
+    output_encode: String,
 }
 
 #[derive(Debug)]
@@ -130,16 +132,16 @@ pub struct ResultConfig {                   //处理结果的配置
     pub pocs_file: String,
     pub conn_timeout: u64,
     pub conn_retries: u8,
-    pub write_timeout: u64,
-    pub read_timeout: u64,
-    pub redirect_times: u8,
+    pub http_timeout: u64,
+    pub follow_redirect: bool,
     pub poc_exclude_files: Vec<String>,         //排除文件
     pub disable_poc: bool,
     pub detect_limit: u16,                  //url limit
-    pub poc_limit: u16,
+    pub per_url_limit: u16,
     pub it_assets: (Vec<String>,Vec<String>),  //资产, ([domain],[ip])
     pub print_level: u8,
-    pub output_file_name: String
+    pub output_file_name: String,
+    pub output_encode: String,
 }
 
 #[derive(Debug)]
@@ -169,27 +171,33 @@ fn rand_string(len:usize)-> String {
 
 pub fn get_config()-> (ResultConfig,Config) {
     let app = App::new("Ratel").settings(&vec![AppSettings::DisableVersion,AppSettings::DisableHelpSubcommand])
-    .help(" Usage: Ratel -s | -t | -f file < --passive | --active | --urls | --recovery >
+    .help(" Usage: Ratel -s | -t | -i | -f file < --passive | --active | --urls | --recovery >
  Options:
-    -s,--string  <string>                 被动搜索字符串(例如: domain=\\\"example.com\\\"，注意命令行转义\"\\\")
+    -s,--string  <string>                 passive search string with api(etc: domain=\\\"example.com\\\"，character need be escaped).
     
-    -t,--targets <ip,domain,cidr,...>     主动扫描指定目标主机(逗号分隔主机)
+    -t,--targets <ip,domain,cidr,...>     active scan targets host(separated by comma).
     
-    -f,--file    <file>                   从文件读取(换行分隔)
-                 --passive                被动信息搜集
-                 --active                 将文件视为主机列表进行主动扫描
-                 --urls                   将文件视为url列表进行探测
-                 --recovery               从notice结果文件中恢复error page和break page查询
+    -i,--stdin                            read from stdin(or output of a process piped).
+    -f,--file    <file>                   read from file(separated by newline).
+                 --passive                specify the file|stdin as string list.
+                 --active                 specify the file|stdin as target list.
+                 --urls                   specify the file|stdin as url list.
+                 --recovery               read error page or break page from notice result,recovery api query.
 
-    -o,--output        <filename>         输出文件名前缀（默认为当前时间+5随机字符，结果包含xxx_result.xlsx，xxx_result_notice.txt）
-    -e,--exclude       <files1,..>        被动搜索，主动扫描，url探测时排除的文件，逗号分隔多个文件
-    --poc-exclude      <files1,..>        poc探测时的排除文件(不同任务会存在相同的资产，而poc探测是耗时的，须是Ratel输出的xlsx结果文件，逗号分隔多个文件)
-    --disable-poc                         禁用poc探测
-    -h,--help                             打印帮助")
+    -o,--output        <filename>         output filename prefix(default current time + random chars,result contains xxx_result.xlsx or xxx_result_notice.txt(for recovery)).
+    -p,--ports         <ports>            specify active scan ports(etc:80-100,443, default from config file).
+    -l,--limit         <num>              port scan limit(default from config file,max 65535).
+    -P,--poc-file      <filename>         specify the POC file(default from config file).
+    -e,--exclude       <files1,..>        pasive,active,urls exclude files(separated by comma).
+    --poc-exclude      <files1,..>        poc detecting exclude targets file(must be Ratel output .xlsx result,separated by comma).
+    --disable-poc                         disable poc mod.
+    -h,--help                             print help.")
     .arg(Arg::with_name("passive")
         .conflicts_with("active")
         .conflicts_with("targets")        //targets  配合active参数
         .conflicts_with("recovery")
+        .conflicts_with("ports")
+        .conflicts_with("limit")
         .takes_value(false)
         .long("passive")
     )
@@ -204,7 +212,9 @@ pub fn get_config()-> (ResultConfig,Config) {
         .conflicts_with("active")
         .conflicts_with("recovery")
         .conflicts_with("targets")        //targets  配合active参数
-        .conflicts_with("search_string")  //search_string 配合的passive参数 
+        .conflicts_with("search_string")  //search_string 配合的passive参数
+        .conflicts_with("ports")
+        .conflicts_with("limit")
         .takes_value(false)
         .long("urls"))
     .arg(Arg::with_name("recovery")
@@ -212,6 +222,8 @@ pub fn get_config()-> (ResultConfig,Config) {
         .conflicts_with("active")
         .conflicts_with("targets")        //targets  配合active参数
         .conflicts_with("search_string")
+        .conflicts_with("ports")
+        .conflicts_with("limit")
         .takes_value(false)
         .long("recovery")
     )
@@ -219,19 +231,38 @@ pub fn get_config()-> (ResultConfig,Config) {
         .short("s")
         .long("string")
         .takes_value(true)
-        .conflicts_with("targets"))
+        .conflicts_with("targets")
+        .conflicts_with("stdin"))
     .arg(Arg::with_name("targets")
         .short("t")
         .long("targets")
-        .takes_value(true))
+        .takes_value(true)
+        .conflicts_with("stdin"))
+    .arg(Arg::with_name("stdin")
+        .short("i")
+        .long("stdin")
+        .takes_value(false))
     .arg(Arg::with_name("file_list")
         .short("f")
         .long("file")
         .takes_value(true)
-        .required_unless_one(&vec!["search_string","targets"]))
+        .required_unless_one(&vec!["search_string","targets","stdin"]))
     .arg(Arg::with_name("output")
         .short("o")
         .long("output")
+        .takes_value(true))
+    .arg(Arg::with_name("ports")
+        .short("p")
+        .long("ports")
+        .takes_value(true))
+    .arg(Arg::with_name("limit")
+        .short("l")
+        .long("limit")
+        .takes_value(true))
+    .arg(Arg::with_name("pocs_file")
+        .short("P")
+        .long("poc-file")
+        .conflicts_with("disable_poc")
         .takes_value(true))
     .arg(Arg::with_name("exclude_files")
         .short("e")
@@ -250,24 +281,33 @@ pub fn get_config()-> (ResultConfig,Config) {
                 println!("{}",e.message);
             },
             ErrorKind::ArgumentConflict => {
-                println!("参数冲突 使用-h 打印帮助");
-            },
-            ErrorKind::UnexpectedMultipleUsage => {
-                println!("参数重复 使用-h 打印帮助");
+                println!("arguments conflicts, \"-h\" print help.");
             },
             ErrorKind::EmptyValue => {
-                println!("参数值为空 使用-h 打印帮助");
+                println!("empty value, \"-h\" print help.");
+            },
+            ErrorKind::UnexpectedMultipleUsage => {
+                println!("multiple values to an argument, \"-h\" print help.");
             },
             ErrorKind::MissingRequiredArgument => {
-                println!("缺少必须的参数<-s|-t|-f> 使用-h 打印帮助");
+                println!("not provide required arguments, <-s|-t|-f|-i>, \"-h\" print help.");
             },
             _ => {
-                println!("{:?} 使用-h 打印帮助",e.kind);
+                println!("\"-h\" print help.");
             }
         }
         exit(-1);        
     });
-
+    let async_scan_limit = if let Some(l) = app_matches.value_of("limit") {
+        if let Ok(n) = l.parse::<u16>() {
+            Some(n)
+        } else {
+            println!("argument need a number value, max 65535. \"-h\" print help.");
+            exit(-1);
+        }
+    } else {
+        None
+    };
     let exclude_files = if let Some(ef) =  app_matches.value_of("exclude_files") {
         ef.split(',').map(|s|{s.to_string()}).collect::<Vec<String>>()
     } else {
@@ -302,9 +342,13 @@ pub fn get_config()-> (ResultConfig,Config) {
 
     let now = Local::now();
     let output_file_name = if let Some(fname) =  app_matches.value_of("output") {
-        fname.to_string()
+        if std::path::Path::new(&format!("{}_results.csv",fname)).exists() {
+            fname.to_string() + "_" + &rand_string(5)
+        } else {
+            fname.to_string()
+        }
     } else {
-        now.format("%Y-%m%d-%H%M-").to_string() + &rand_string(5)
+        now.format("%Y-%m%d-%H%M_").to_string() + &rand_string(5)
     };
     
     let mut all = Vec::new();
@@ -319,6 +363,23 @@ pub fn get_config()-> (ResultConfig,Config) {
             }
         }
     };
+    if app_matches.is_present("stdin") {
+        loop {
+            let mut line = String::new();
+            if let Ok(size) = std::io::stdin().read_line(&mut line) {
+                if size > 0 {
+                    let line = line.trim();
+                    if line.len() > 0 {
+                        all.push(line.to_string());
+                    }
+                } else {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+    }
     let mut passive = false;
     let mut active = false;
     if let Some(s) = app_matches.value_of("search_string") {
@@ -345,20 +406,26 @@ pub fn get_config()-> (ResultConfig,Config) {
             ips.push(i.to_string());
         }
     }
+    let pocs_file = if let Some(v) = app_matches.value_of("pocs_file") {
+        v.to_string()
+    } else {
+        toml_conf.default_pocs_json_path
+    };
+
     let rst_config = ResultConfig {
-        pocs_file: toml_conf.pocs_json_path,
+        pocs_file,
         conn_timeout: toml_conf.conn_timeout,
         conn_retries: toml_conf.conn_retries,
-        write_timeout: toml_conf.write_timeout,
-        read_timeout: toml_conf.read_timeout,
-        redirect_times: toml_conf.redirect_times,
+        http_timeout: toml_conf.http_timeout,
+        follow_redirect: toml_conf.follow_redirect,
         poc_exclude_files,
         disable_poc,
         detect_limit: toml_conf.detect_limit,
-        poc_limit: toml_conf.poc_limit,
+        per_url_limit: toml_conf.per_url_limit,
         it_assets:(domains,ips),
         print_level: toml_conf.print_level,
-        output_file_name
+        output_file_name,
+        output_encode: toml_conf.output_encode
     };
 
     let mut run_mod = PassiveMod::Query;
@@ -390,7 +457,12 @@ pub fn get_config()-> (ResultConfig,Config) {
         }));
     } else if active || app_matches.is_present("active") {
         let port_parser = PortsParser::new();
-        let scan_ports = port_parser.parse_ports_string(&toml_conf.scanports).unwrap_or_else(|e|{
+        let ports_str = if let Some(v) = app_matches.value_of("ports") {
+            v
+        } else {
+            &toml_conf.default_scanports
+        };
+        let scan_ports = port_parser.parse_ports_string(ports_str).unwrap_or_else(|e|{
             println!("[!] Config \"scanports\" not correct: {}",e);
             exit(-1);
         });
@@ -400,7 +472,7 @@ pub fn get_config()-> (ResultConfig,Config) {
         return (rst_config,Config::Active(ActiveConfig{
                 targets: all,
                 exclude_files,
-                async_scan_limit:toml_conf.async_scan_limit,
+                async_scan_limit:async_scan_limit.unwrap_or(toml_conf.async_scan_limit),
                 scan_ports,
                 conn_timeout: toml_conf.conn_timeout,
                 conn_retries: toml_conf.conn_retries
@@ -411,7 +483,7 @@ pub fn get_config()-> (ResultConfig,Config) {
             exclude_files
         }));
     } else {
-        println!("--passive | --active | --urls | --recovery选择模式");
+        println!("--passive | --active | --urls | --recovery choose mod.");
         exit(-1);
     }
 }
@@ -456,9 +528,12 @@ pub fn read_excludes(exclude_files:Vec<String>) -> Vec<String> {
 
 #[cfg(test)]
 mod tests {
-    use super::passive::QueryMatcher;
-    use regex::Regex;
-    #[test]
+    use super::*;
+    use std::{time::Duration, sync::Arc};
+    use async_std::prelude::StreamExt;
+    use regex::{Regex, internal::Input};
+    use super::http_banner::{http_cli,https_with_cert};
+    //#[test]
     fn fofa_zoomeye() {
         /*
         let test1 = Regex::new("(?:&&)|(?:\\|\\|)").unwrap();
@@ -512,4 +587,111 @@ mod tests {
         println!("fofa {} {}",s10,fofa_regex.is_match(s10));
         println!("zoomeye {} {}",s10,zoomeye_regex.is_match(s10));
     }
+    
+    use futures::stream::FuturesUnordered;
+
+    //#[tokio::test]
+    async fn test1() {
+        let urls = std::fs::read_to_string("testurls.txt").unwrap();
+        let urls = urls.split("\n").map(|s| { s.trim() } ).collect::<Vec<&str>>();
+        let mut urls_iter = urls.into_iter();
+        let mut ftrs = FuturesUnordered::new();
+        for i in 0..200 {
+            if let Some(u) = urls_iter.next() {
+                let tmp = u.split("://").collect::<Vec<&str>>();
+                let protocol = tmp[0];
+                let host = tmp[1].split(":").collect::<Vec<&str>>();
+                let port = host[1].parse::<u16>().unwrap();
+                let host = host[0];
+                let headers = Vec::new();
+                //headers.push(("User-Agent", USER_AGENT));
+                //headers.push(("Connection", "Close"));
+                let req = fmt_req(host,port,"GET", "/", headers, None);
+                //let req = format!("GET / HTTP/1.1\r\nHost: {}:{}\r\nUser-Agent: {}\r\nConnection: Close\r\n\r\n",host,port,USER_AGENT);
+                ftrs.push(http_cli(protocol,host, port, req, Duration::from_secs(3), Duration::from_secs(15)));
+            }
+        }
+        //async_std::task::sleep(Duration::from_secs(15)).await;
+        println!("start async task");
+        while let Some(_) = ftrs.next().await {
+            if let Some(u) = urls_iter.next() {
+                let tmp = u.split("://").collect::<Vec<&str>>();
+                let protocol = tmp[0];
+                let host = tmp[1].split(":").collect::<Vec<&str>>();
+                let port = host[1].parse::<u16>().unwrap();
+                let host = host[0];
+                let headers = Vec::new();    
+                let req = fmt_req(host,port,"GET", "/", headers, None);
+                //let req = format!("GET / HTTP/1.1\r\nHost: {}:{}\r\nUser-Agent: {}\r\nConnection: Close\r\n\r\n",host,port,USER_AGENT);
+                ftrs.push(http_cli(protocol,host, port, req, Duration::from_secs(3), Duration::from_secs(15)));
+            }
+        }
+    }
+
+    //#[tokio::test]
+    async fn test2() {
+        let mut headers = Vec::new();
+        //headers.push(("Host".to_string(), host.to_string()));
+        headers.push(("Host","www.baidu.com"));
+        headers.push(("User-Agent", USER_AGENT));
+        headers.push(("Connection", "Close"));
+        let req = fmt_req("www.baidu.com",443,"GET", "/asdfa", headers, None);
+        let x = https_with_cert("www.baidu.com", 443, req, Duration::from_secs(3), Duration::from_secs(15)).await;
+        match x {
+            Some(rst) =>{
+                let rsp = if let Some(data) = rst.0 {
+                    let rsp = data.2;
+                    //rsp.append(&mut data.2);
+                    String::from_utf8_lossy(&rsp).to_string()
+                } else {
+                    "error".to_string()
+                };
+                println!("http response {:?}",rsp);
+                if let Some(cert) = rst.1 {
+                    let ds = cert_parser(cert);
+                    println!("cert: {:?}",ds);
+                }
+            }
+            _ => {}
+        }
+    }
+
+    use reqwest;
+    //#[tokio::test]
+    async fn test3() {
+        let x = reqwest::get("https://www.baidu.com/asdf").await.unwrap().text().await.unwrap();
+        println!("{}",x);
+    }
+
+    use http_types::Url;
+
+    //#[tokio::test]
+    async fn test4() {
+        let url = "http://www.test.com:8000/index?=s";
+        println!("{:?}",url_parser(url.as_bytes()));
+        let p = "/asdf/asdf/";
+        println!("{:?}",find_last(p.as_bytes(), b"/"));
+        let url = Url::parse("https://127.0.0.1:443//hjj/asdfas.html").unwrap();
+        println!("{:?} {}",url.port_or_known_default(),url.path());
+        let req = fmt_req("www.baidu.com", 443, "GET", "/asdf/asdf/../../favicon.ico", vec![], None);
+        let rsp = http_cli("https", "www.baidu.com", 443,req , Duration::from_secs(3), Duration::from_secs(10)).await;
+        match rsp {
+            Ok(r) => {
+                println!("{}",String::from_utf8_lossy(&r.2));
+            },
+            Err(e) => {}
+        }
+    }
+    #[test]
+    fn test5() {
+        let url = "https://127.0.0.1/.././view.html?path=./test.txt";
+        let httpu = HttpUrl::new(url.to_string()).unwrap();
+        println!("{:?}",httpu);
+        println!("{}",httpu.protocol());
+        println!("{}",httpu.host());
+        println!("{}",httpu.port());
+        println!("{}",httpu.url_with_path());
+        println!("{}",httpu.path());
+        println!("{}",httpu.path_args());
+    }    
 }

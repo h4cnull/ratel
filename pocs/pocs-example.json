@@ -1,0 +1,65 @@
+{
+  "pocs": [
+    {
+      "name": "xxx-RCE",
+      "level": 5,
+      "requests": [
+        {
+          "method": "POST",
+          "req_body": "xx$HOST$x",
+          "headers": {"Cookie": "x$HOST$xx","cmd": "echo hellorec","connection":"Clo"},
+          "rules": {
+            "header": ["aaa","bbb"],
+            "body": ["hellorec","world"]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Directory list",
+      "requests": [
+        {
+          "rules": {
+            "body": ["Directory listing for"],
+            "status_code": 200
+          }
+        }
+      ]
+    },
+    {
+      "name": "DrayWebServer hash",
+      "requests": [
+        {
+          "rules": {
+            "favicon": 1013918534
+          }
+        }
+      ]
+    },
+    {
+      "name": "multi req",
+      "requests": [
+        {
+          "path_args": "/$HOST$"
+        },
+        {
+          "path_args": "/test.txt",
+          "variables_regex": "token=\"(.*?)\" id=\"(.*?)\".*?(regex2)",
+          "regex_dot_all": true,
+          "variables_group": [["$token$",1],["$id$",2],["rqa234asf",3]],
+          "rules": {
+            "status_code": 200
+          }
+        },
+        {
+          "path_args": "/req2/$id$/rqa234asf?token=$token$",
+          "method": "POST",
+          "req_body": "token=$token$&id=$id$",
+          "rules": {
+            "status_code": 501
+          }
+        }
+      ]
+    }
+  ]
+}

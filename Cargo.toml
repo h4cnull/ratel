@@ -1,6 +1,6 @@
 [package]
 name = "ratel"
-version = "0.1.0"
+version = "2.0.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -15,9 +15,8 @@ x509-parser = "0.12.0"
 async-std = { version = "1", features = ["attributes", "tokio1"] }
 futures = "0.3.17"
 async-native-tls = "0.3.3"
-serde_json = "1.0.69"
+serde_json = "1.0.79"
 reqwest = { version = "0.11", features = ["blocking", "json", "native-tls"] }
-tokio = { version = "1", features = ["full"] }
 dns-lookup = "1.0.8"
 cidr-utils = "0.5.5"
 base64 = "0.13"
@@ -25,7 +24,10 @@ murmur3 = "0.5.1"
 chrono = "0.4.19"
 rand = "0.8.4"
 urlencoding = "1.0.0"
-umya-spreadsheet = "0.4.5"
+encoding_rs = "0.8.30"
+csv = "1.1.6"
+async-h1 = {path="./async-h1"}
+http-types = { version = "2.12.0", default-features = false }
 
 [profile.release]
 panic = 'abort'

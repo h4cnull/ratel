@@ -1,0 +1,35 @@
+#toml config file
+fofa_enable = true
+fofa_email = ''
+fofa_key = ''
+fofa_per_page_size = 1000
+fofa_timeout = 10
+fofa_retry_delay = 1
+fofa_delay = 0       #second
+
+zoomeye_enable = true
+zoomeye_keys = []
+#zoomeye_keys = ['key1','key2']
+zoomeye_timeout = 10
+zoomeye_delay = 2   #second
+
+auto_web_filter = true  #搜索cidr时自动添加http过滤条件
+passive_retries = 3
+
+default_scanports = '80-89,443,666,888,1000-1010,6000-6010,6666,7000-7010,8000-8100,8800-8890,9000-9010,9999,60000-60001,65535'
+async_scan_limit = 800
+
+conn_timeout = 2500     #millisecond
+conn_retries = 1        #主动扫描重试次数，确保可靠性
+
+http_timeout = 15        #second
+follow_redirect = true   #仅影响http banner探测时是否跟随重定向。
+
+default_pocs_json_path = 'fingers.json'
+detect_limit = 100       # 不同ip:port地址探测时的并发数量限制
+per_url_limit = 10       # 每个url进行poc验证时的并发数量限制，过高的数量可能被waf封锁
+
+#注意limit值过高会超过io瓶颈，影响准确性，http探测默认100*10，探测并发不超过1000。在linux下值过高可能会出现too many open files!，需更改linux配置。
+
+print_level = 1         #打印级别，默认结果为0，不打印。poc的level默认1。
+output_encode = 'gbk'   #utf-8 windows-1250 iso-8859-16 etc...

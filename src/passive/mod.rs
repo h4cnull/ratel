@@ -10,7 +10,7 @@ use serde::Deserialize;
 
 use super::result_struct::*;
 use super::Message;
-use super::https_banner::USER_AGENT;
+use super::http_banner::USER_AGENT;
 
 #[derive(Deserialize)]
 pub struct FofaResult {
