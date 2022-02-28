@@ -25,7 +25,7 @@
 ​	你可以设置多个zoomeye key，如果key没有额度了会自动使用下一个key。conn_timeout为端口扫描、http连接超时时间，http_timeout为http连接成功至读取完成的超时时间。
 
 ​	ratel提供细粒度的http poc探测模块。如下：
-```json
+```text
 {
   "pocs": [
     {
