@@ -70,7 +70,7 @@
   ]
 }
 ```
-​	你可以使用poc模块实现指纹探测，漏洞扫描，目录扫描。项目提供的指纹探测文件fingers.json，主要提取自https://github.com/EdgeSecurityTeam/EHole, 以及部分作者补充的。
+​	你可以使用poc模块实现指纹探测，漏洞扫描。项目提供的指纹探测文件fingers.json，主要提取自https://github.com/EdgeSecurityTeam/EHole, 以及部分作者补充的。
 
 ### 声明
 
