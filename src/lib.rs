@@ -60,7 +60,7 @@ per_url_limit = 10       # 每个url进行poc验证时的并发数量限制，�
 
 #注意limit值过高会超过io瓶颈，影响准确性，http探测默认100*10，探测并发不超过1000。在linux下值过高可能会出现too many open files!，需更改linux配置。
 
-print_level = 1         #打印级别，默认结果为0，不打印。poc的level默认1。
+print_level = 0         #打印级别，可访问http资产level默认为0。poc的level默认为1。
 output_encode = 'gbk'   #utf-8 windows-1250 iso-8859-16 etc...";
 
 #[derive(Deserialize)]
@@ -532,7 +532,7 @@ mod tests {
     use std::{time::Duration, sync::Arc};
     use async_std::prelude::StreamExt;
     use regex::{Regex, internal::Input};
-    use super::http_banner::{http_cli,https_with_cert};
+    use super::http_banner::{http_cli};
     //#[test]
     fn fofa_zoomeye() {
         /*
@@ -628,34 +628,6 @@ mod tests {
         }
     }
 
-    //#[tokio::test]
-    async fn test2() {
-        let mut headers = Vec::new();
-        //headers.push(("Host".to_string(), host.to_string()));
-        headers.push(("Host","www.baidu.com"));
-        headers.push(("User-Agent", USER_AGENT));
-        headers.push(("Connection", "Close"));
-        let req = fmt_req("www.baidu.com",443,"GET", "/asdfa", headers, None);
-        let x = https_with_cert("www.baidu.com", 443, req, Duration::from_secs(3), Duration::from_secs(15)).await;
-        match x {
-            Some(rst) =>{
-                let rsp = if let Some(data) = rst.0 {
-                    let rsp = data.2;
-                    //rsp.append(&mut data.2);
-                    String::from_utf8_lossy(&rsp).to_string()
-                } else {
-                    "error".to_string()
-                };
-                println!("http response {:?}",rsp);
-                if let Some(cert) = rst.1 {
-                    let ds = cert_parser(cert);
-                    println!("cert: {:?}",ds);
-                }
-            }
-            _ => {}
-        }
-    }
-
     use reqwest;
     //#[tokio::test]
     async fn test3() {
@@ -663,25 +635,6 @@ mod tests {
         println!("{}",x);
     }
 
-    use http_types::Url;
-
-    //#[tokio::test]
-    async fn test4() {
-        let url = "http://www.test.com:8000/index?=s";
-        println!("{:?}",url_parser(url.as_bytes()));
-        let p = "/asdf/asdf/";
-        println!("{:?}",find_last(p.as_bytes(), b"/"));
-        let url = Url::parse("https://127.0.0.1:443//hjj/asdfas.html").unwrap();
-        println!("{:?} {}",url.port_or_known_default(),url.path());
-        let req = fmt_req("www.baidu.com", 443, "GET", "/asdf/asdf/../../favicon.ico", vec![], None);
-        let rsp = http_cli("https", "www.baidu.com", 443,req , Duration::from_secs(3), Duration::from_secs(10)).await;
-        match rsp {
-            Ok(r) => {
-                println!("{}",String::from_utf8_lossy(&r.2));
-            },
-            Err(e) => {}
-        }
-    }
     #[test]
     fn test5() {
         let url = "https://127.0.0.1/.././view.html?path=./test.txt";

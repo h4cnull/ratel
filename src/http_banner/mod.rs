@@ -73,27 +73,6 @@ pub fn fmt_req(host:&str,port:u16,method:&str,path_args:&str,headers:Vec<(&str,&
     return rst;
 }
 
-pub async fn https_with_cert(host:&str,port:u16,request:String,tcp_conn_timeout:Duration,http_timeout:Duration)-> Option<(Option<(u16,Option<String>,Vec<u8>,Vec<u8>)>,Option<Certificate>)>{
-    if let Ok(stream) = io::timeout(tcp_conn_timeout,TcpStream::connect(format!("{}:{}",host,port))).await {
-        if let Ok(rst) = future::timeout(http_timeout+tcp_conn_timeout, async {
-            let connector = TlsConnector::new();
-            let connector = connector.danger_accept_invalid_certs(true);
-            if let Ok(s) = connector.connect(host, stream).await {
-                    let cert =  if let Ok(cert) = s.peer_certificate() { cert } else { None };  //需要耗费时间
-                    let rsp = if let Ok(r) = async_h1::connect(s, request.as_bytes()).await { Some(r) } else { None };
-                    (rsp,cert)
-            } else {
-                (None,None)
-            }
-        }).await {
-            if rst.0.is_some() || rst.1.is_some() {
-                return Some(rst);
-            }
-        }
-    }
-    return None;
-}
-
 pub async fn http_cli(protocol:&str,host:&str,port:u16,request:String,tcp_conn_timeout:Duration,http_timeout:Duration)-> Result<(u16,Option<String>,Vec<u8>,Vec<u8>),Box<dyn std::error::Error>>{
     let stream = io::timeout(tcp_conn_timeout,TcpStream::connect(format!("{}:{}",host,port))).await?;
     if protocol == "https" {
@@ -175,17 +154,6 @@ pub fn cert_parser(cert:async_native_tls::Certificate) -> Result<Vec<String>,Box
     }
 }
 
-
-pub fn find_last(source:&[u8],find:&[u8]) -> Option<usize> {
-    let mut start = 0;
-    let mut rst = None;
-    while let Some(i) = find_slice(source,start,find) {
-        start = i+1;
-        rst = Some(i);
-    }
-    return rst;
-}
-
 pub fn find_slice(source:&[u8],start:usize,find:&[u8])-> Option<usize> {
     let source_len = source.len();
     let find_len = find.len();
@@ -199,7 +167,14 @@ pub fn find_slice(source:&[u8],start:usize,find:&[u8])-> Option<usize> {
     return None;
 }
 
-
+pub fn find_u8(source:&[u8],start:usize,find:u8)->Option<usize> {
+    for i in start..source.len() {
+        if source[i] == find {
+            return Some(i);
+        }
+    }
+    return None;
+}
 
 #[derive(Debug)]
 pub struct HttpUrl {
@@ -340,44 +315,4 @@ impl HttpUrl {
     pub fn port(&self) -> u16 {
         self.port
     }
-}
-
-pub fn find_u8(source:&[u8],start:usize,find:u8)->Option<usize> {
-    for i in start..source.len() {
-        if source[i] == find {
-            return Some(i);
-        }
-    }
-    return None;
-}
-
-pub fn url_parser(url_bytes:&[u8])->Option<(&str,&str,u16,&str)> {
-    if let Some(proto_i) = find_slice(url_bytes, 0, b"://") {
-        if let Ok(protocol) = std::str::from_utf8(&url_bytes[..proto_i]) {
-            if let Some(path_args_i) = find_slice(url_bytes, proto_i+3, b"/") {
-                if let Ok(path_args) = std::str::from_utf8(&url_bytes[path_args_i..]) {
-                    if let Some(port_i) = find_slice(url_bytes, proto_i+3, b":") {
-                        if let Ok(host) = std::str::from_utf8(&url_bytes[proto_i+3..port_i]) {
-                            if let Ok(port_str) = std::str::from_utf8(&url_bytes[port_i+1..path_args_i]) {
-                                if let Ok(port) = port_str.parse::<u16>() {
-                                    return Some((protocol,host,port,path_args));
-                                }
-                            }
-                        }
-                    } else {
-                        if let Ok(host) = std::str::from_utf8(&url_bytes[proto_i+3..path_args_i]) {
-                            if protocol == "http" {
-                                return Some((protocol,host,80,path_args));
-                            } else if protocol == "https" {
-                                return Some((protocol,host,443,path_args));
-                            } else {
-                                return None;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    return None;
 }

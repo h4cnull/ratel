@@ -12,8 +12,6 @@ use super::http_banner::*;
 use super::result_struct::{Record,Data,RecordType::*};
 use super::ResultConfig;
 
-use http_types::Url;
-
 pub struct Detector {
     server_regex: Regex,
     icon_regex: Regex,
@@ -323,7 +321,7 @@ impl Detector {
                     //计算favicon hash!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     /////println!("favicon url {:?}",favicon_url);
                     if favicon_url.is_some() {
-                        favicon_hash = self.favicon_hash(&favicon_url.unwrap()).await;
+                        favicon_hash = self.favicon_hash(favicon_url.unwrap()).await;
                         data.favicon = favicon_hash;
                     }
                 }
@@ -703,14 +701,14 @@ impl Detector {
         }
     }
 
-    async fn favicon_hash(&self,url:&str) -> Option<i32> {
-        let url = Url::parse(url).unwrap();
-        let host = url.host_str().unwrap();
-        let port = url.port_or_known_default().unwrap();
+    async fn favicon_hash(&self,url:String) -> Option<i32> {
+        let url = HttpUrl::new(url).unwrap();
+        let host = url.host();
+        let port = url.port();
         let path = url.path();
         let req = fmt_req(host, port, "GET", path, Vec::new(), None);
         let mut favicon_hash = None;
-        if let Ok(rsp) = http_cli(url.scheme(), host,port, req, self.conn_timeout, self.http_timeout).await {
+        if let Ok(rsp) = http_cli(url.protocol(), host,port, req, self.conn_timeout, self.http_timeout).await {
             if rsp.0 == 200 {
                 let mut base64_buf = String::new();
                 base64::encode_config_buf(rsp.3, base64::STANDARD, &mut base64_buf);

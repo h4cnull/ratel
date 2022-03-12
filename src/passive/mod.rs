@@ -83,7 +83,6 @@ pub fn unverify_client(timeout:Duration)-> Client {
 }
 
 pub fn http_req(req:RequestBuilder)-> Result<String,Box<dyn Error>> {
-    //https://fofa.info/api/v1/search/all?email=%s&page=%d&size=%d&key=%s&qbase64=%s&fields=ip,host,title,port,protocol
     let content = req.send()?.text()?;
     Ok(content)
 }
@@ -597,72 +596,7 @@ pub enum ZoomeyePortInfo {
 
 #[derive(Deserialize)]
 pub struct ZoomeyeStringPortInfo {
-    pub port: String,       //智障zoomeye, 有些返回结果 port是string类型
+    pub port: String,       //zoomeye, 某些返回结果 port是string类型
     pub service: String,
     pub title: Option<Vec<String>>
 }
-
-/*
-fn zoomeye_key_resources(key:&str,zoomeye_timeout:Duration,retries:u8,zoomeye_delay:Duration){
-    let cli = unverify_client(zoomeye_timeout);
-    let url = "https://api.zoomeye.org/resources-info";
-    let req_builder = cli.get(url).header("User-Agent", USER_AGENT).header("API-KEY", key);
-    for _ in 0..=retries {
-        if let Ok(content) = http_req(req_builder.try_clone().unwrap()) {
-            let res_info = serde_json::from_str::<ZoomeyeResourcesInfo>(&content);
-            match res_info {
-                Ok(info) => {
-                    if info.resources.search > 0 {
-                        println!("[-] Zoomeye key {} is ok, remain quota {}",key,info.resources.search);
-                    } else {
-                        println!("[!] Zoomeye key {} got no more quota!",key);
-                    }
-                },
-                Err(_) => {
-                    println!("[!] Zoomeye key {} is invalid. content {}",key,content);
-                }
-            }
-            break;
-        }
-        std::thread::sleep(zoomeye_delay);
-    }  
-}
-
-pub fn zoomeye_key_check(keys:&mut Vec<String>,zoomeye_timeout:Duration,retries:u8) -> Result<String,ZoomeyeKeyError> {
-    if let Some(key) = keys.pop() {
-        let cli = unverify_client(zoomeye_timeout);
-        let url = "https://api.zoomeye.org/resources-info";
-        let req_builder = cli.get(url).header("User-Agent", USER_AGENT).header("API-KEY", key.as_str());
-        for _ in 0..=retries {
-            if let Ok(content) = http_req(req_builder.try_clone().unwrap()) {
-                let res_info = serde_json::from_str::<ZoomeyeResourcesInfo>(&content);
-                match res_info {
-                    Ok(info) => {
-                        if info.resources.search > 0 {
-                            println!("[-] Zoomeye key {} is ok, remain quota {}",key,info.resources.search);
-                            return Ok(key);
-                        } else {
-                            println!("[!] Zoomeye key {} got no more quota!",key);
-                            return zoomeye_key_check(keys, zoomeye_timeout, retries);
-                        }
-                    },
-                    Err(_) => {
-                        println!("[!] Zoomeye key {} is invalid",key);
-                        return zoomeye_key_check(keys, zoomeye_timeout, retries);
-                    }
-                }
-            }
-        }
-        keys.push(key);
-        return Err(ZoomeyeKeyError::MaxRetry);
-    } else {
-        println!("[!] No more valid zoomeye key");
-        return Err(ZoomeyeKeyError::NoMore);
-    }
-}
-
-pub enum ZoomeyeKeyError {
-    MaxRetry,
-    NoMore
-}
-*/
