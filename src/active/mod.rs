@@ -145,7 +145,7 @@ pub async fn scan_port(record:ActiveRecord,timeout:Duration,tries:u8) -> Option<
     let mut rst: Option<ActiveRecord> = None;
     loop {
         try_num += 1;
-        match io::timeout(timeout,async move { TcpStream::connect(socket_addr).await }).await {
+        match io::timeout(timeout,TcpStream::connect(socket_addr)).await {
             Ok(stream) => {
                 let _ = stream.shutdown(Shutdown::Both);
                 rst = Some(record);
