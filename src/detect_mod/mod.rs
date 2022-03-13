@@ -705,7 +705,7 @@ impl Detector {
         let url = HttpUrl::new(url).unwrap();
         let host = url.host();
         let port = url.port();
-        let path = url.path();
+        let path = url.path_args();
         let req = fmt_req(host, port, "GET", path, Vec::new(), None);
         let mut favicon_hash = None;
         if let Ok(rsp) = http_cli(url.protocol(), host,port, req, self.conn_timeout, self.http_timeout).await {
