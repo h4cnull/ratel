@@ -31,7 +31,7 @@
     {
       "name": "multi request poc",   //必须指定
       "author": "h4cnull",
-      "level": "poc level",          //u8类型：0-255，指示该poc的级别，非必须，默认1。结合config中的print_level，可以在运行时只打印重要的信息。
+      "level": "5",                  //u8类型：0-255，指示该poc的级别，非必须，默认1。结合config中的print_level，可以在运行时只打印重要的信息。
       "requests": [                  //请求列表，必须
         {                            //请求中的字段都是非必须
           "path_args": "/$HOST$"     //请求路径和参数，非必须，默认 /，$HOST$是特殊变量，值为当前请求的host(ip或域名)。使用该变量方便进行大量OOB测试时区分漏洞主机。
