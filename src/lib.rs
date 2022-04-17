@@ -191,6 +191,7 @@ pub fn get_config()-> (ResultConfig,Config) {
     -e,--exclude       <files1,..>        pasive,active,urls exclude files(separated by comma).
     --poc-exclude      <files1,..>        poc detecting exclude targets file(must be Ratel output .xlsx result,separated by comma).
     --disable-poc                         disable poc mod.
+    --fofa-size                           fofa per page size.
     -h,--help                             print help.")
     .arg(Arg::with_name("passive")
         .conflicts_with("active")
@@ -273,7 +274,15 @@ pub fn get_config()-> (ResultConfig,Config) {
         .takes_value(true))
     .arg(Arg::with_name("disable_poc")
         .long("disable-poc")
-        .takes_value(false));
+        .takes_value(false))
+    .arg(Arg::with_name("fofa_per_page_size")
+        .conflicts_with("active")
+        .conflicts_with("targets")        //targets  配合active参数
+        .conflicts_with("ports")
+        .conflicts_with("limit")
+        .conflicts_with("urls")
+        .long("fofa-size")
+        .takes_value(true));
     let app_matches = app.get_matches_safe().unwrap_or_else(|e| {
         //println!("{}",e.message);
         match e.kind {
@@ -438,6 +447,16 @@ pub fn get_config()-> (ResultConfig,Config) {
         //if all.len() == 0 {
         //    exit(-1);
         //};
+        let fofa_per_page_size = if let Some(v) = app_matches.value_of("fofa_per_page_size") {
+            if let Ok(n) = v.parse::<u16>() {
+                n
+            } else {
+                println!("[!] page size should be a u16 number.");
+                exit(-1);
+            }
+        } else {
+            toml_conf.fofa_per_page_size
+        };
         return (rst_config,Config::Passive(PassiveConfig{
             run_mod,
             searchs: all,
@@ -445,7 +464,7 @@ pub fn get_config()-> (ResultConfig,Config) {
             fofa_enable: toml_conf.fofa_enable,
             fofa_email: toml_conf.fofa_email,
             fofa_key: toml_conf.fofa_key,
-            fofa_per_page_size: toml_conf.fofa_per_page_size,
+            fofa_per_page_size,
             fofa_timeout: toml_conf.fofa_timeout,
             fofa_retry_delay: toml_conf.fofa_retry_delay,
             fofa_delay: toml_conf.fofa_delay,
