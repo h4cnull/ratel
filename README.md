@@ -22,7 +22,8 @@
 
 <img src=.\img\usage.JPG>
 
-​	注意：-s 被动搜集，从fofa，zoomeye api查询关键字，支持fofa，zoomeye语法，需注意命令行字符转义。-t 主动扫描。-f 需要--passive,--active,--urls,--recovery区分模式，-i从stdin读取，或者管道，同-f需要模式区分。ratel运行时会把需要注意的信息记录在xxx_notice.txt中，可以通过--recovery恢复notice中的错误记录。ratel的输出是csv格式，所有和输入域名、IP相同的资产其is_assert字段标记为TRUE，以方便筛选搜集的资产信息。
+​	注意：-s 被动搜集，从fofa，zoomeye api查询关键字，支持fofa，zoomeye语法，需注意命令行字符转义。-t 主动扫描。-f 需要--passive,--active,--urls,--recovery区分模式，-i从stdin读取，或者管道，同-f需要模式区分。ratel运行时会把需要注意的信息记录在xxx_notice.txt中，可以通过--recovery恢复notice中的错误记录。目前通过fofa接口查询，如果查询的结果包含有敏感资产，会导致整页无返回数据，只能减少fofa每页查询数量。ratel可以通过--recovery和--fofa-size减少每页数量来查询遗漏的数据。
+ratel的输出是csv格式，所有和输入域名、IP相同的资产其is_assert字段标记为TRUE，以方便筛选搜集的资产信息。
 
 ​	ratel从配置文件中读取fofa和zoomeye API key，如果不存在config文件则会自动生成。
 
