@@ -138,7 +138,7 @@ pub fn fofa_search(run_mod:PassiveMod,searchs:Arc<Vec<String>>,fofa_sender:SyncS
         PassiveMod::Query => true,
         PassiveMod::Recovery => false
     };
-    let mut to_the_end = true;
+    let mut to_the_end = 10000;
     let mut start_page = 1;
 
     let query_matcher = QueryMatcher::new();
@@ -172,17 +172,25 @@ pub fn fofa_search(run_mod:PassiveMod,searchs:Arc<Vec<String>>,fofa_sender:SyncS
             if !search.contains("https://fofa.info/") {
                 continue;
             } else if search.starts_with(ERROR_PAGE) {
-                to_the_end = false;
+                //to_the_end = false;
                 let tmp = &search.as_str()[ERROR_PAGE.len()..];   //https://fofa.info/api......
-                let tmp = tmp.split(" ").collect::<Vec<&str>>()[0];   //url
+                let tmp = tmp.split(" ").collect::<Vec<&str>>();
+                if search.contains("contains sensitive info") {
+                    let old_per_size = tmp[2].parse::<u64>().unwrap();
+                    let old_start_page = tmp[1].parse::<u64>().unwrap();
+                    start_page = old_start_page*old_per_size / per_page_size as u64;   
+                    to_the_end = old_start_page * old_per_size + old_per_size;
+                } else {
+                    start_page = tmp[0].parse::<u64>().unwrap()
+                };
+                let tmp = tmp[0];   //url
                 let tmp = tmp.split("&page=").collect::<Vec<&str>>();
-                start_page = tmp[1].parse().unwrap();  //page
+                //start_page = tmp[1].parse().unwrap();  //page
                 let tmp = tmp[0].split("&qbase64=").collect::<Vec<&str>>()[1]; //query
                 let qbase64 = urlencoding::decode(tmp).unwrap();
                 let ss = String::from_utf8(base64::decode(&qbase64).unwrap()).unwrap();
                 (qbase64,ss)
             } else if search.starts_with(BREAK_PAGE) {
-                to_the_end = true;
                 let tmp = &search.as_str()[BREAK_PAGE.len()..];   //https://fofa.info/api......
                 let tmp = tmp.split(" ").collect::<Vec<&str>>()[0];  //url
                 let tmp = tmp.split("&page=").collect::<Vec<&str>>();
@@ -216,11 +224,10 @@ pub fn fofa_search(run_mod:PassiveMod,searchs:Arc<Vec<String>>,fofa_sender:SyncS
                                 fofa_sender.send(Message::Content(Box::new(OtherRecord::new(OtherRecordInfo::FofaNoResult(ss))))).unwrap();
                                 break;
                             }
-                            if rst.size > 0 && rst.results.len() == 0 {
-                                println!("[!] Fofa search {} contains sensitive keyword, no results!",ss);
-                                fofa_sender.send(Message::Content(Box::new(OtherRecord::new(OtherRecordInfo::FofaSensitive(ss))))).unwrap();
-                                break;
-                            }
+                        }  
+                        if rst.size > 0 && rst.results.len() == 0 {
+                            println!("[!] Fofa search {} page {} contains sensitive keyword!", ss, page);
+                            fofa_sender.send(Message::Content(Box::new(OtherRecord::new(OtherRecordInfo::ErrorPage(format!("{} {} {} contains sensitive info",url,page,per_page_size)))))).unwrap();
                         }
                         for _ in 0..rst.results.len() {
                             //["198.57.247.198", "https://gator3234.hostgator.com:2087", "WHM 登录", "2087", ""]
@@ -262,10 +269,7 @@ pub fn fofa_search(run_mod:PassiveMod,searchs:Arc<Vec<String>>,fofa_sender:SyncS
                                 cert_domains: None
                             }))).unwrap();
                         }
-                        if !to_the_end {
-                            break;
-                        }
-                        if (per_page_size as u64) * page >= rst.size || per_page_size * (page as u16) == 10000 {
+                        if (per_page_size as u64) * page >= rst.size || per_page_size as u64 * page == to_the_end {
                             break;
                         }
                     } else if let Ok(fe) = serde_json::from_str::<FofaTopQueryError>(&content) {

@@ -104,14 +104,18 @@ pub struct ActiveRecordIter {
 }
 
 impl ActiveRecordIter {
-    pub fn new(target_iter:TargetIter,ports:Vec<u16>) ->ActiveRecordIter {
+    pub fn new(target_iter:TargetIter,ports:Vec<u16>) -> Option<ActiveRecordIter> {
+        //overflowed its stack
+        if target_iter.total() == &0.to_biguint().unwrap() {
+            return None;
+        };
         let ports_len = ports.len();
-        ActiveRecordIter {
+        Some(ActiveRecordIter {
             target_iter,
             ports,
             ports_index: 0,
             ports_len
-        }
+        })
     }
 }
 

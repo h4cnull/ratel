@@ -123,9 +123,13 @@ async fn active(conf:ActiveConfig,result_sender:SyncSender<Message>) {
     drop(conf.targets);
     drop(es);
     let targets_num = target_iter.total();
+    if targets_num == &0.to_biguint().unwrap() {
+        println!("[-] Active scan: no valid host.");
+        return;
+    };
     let ports_num = &conf.scan_ports.len().to_biguint().unwrap();
     println!("[-] Active scan: hosts:{} ports:{} total:{} limit:{}",targets_num,ports_num,targets_num*ports_num,conf.async_scan_limit);
-    let mut active_record_iter = ActiveRecordIter::new(target_iter,conf.scan_ports);
+    let mut active_record_iter = ActiveRecordIter::new(target_iter,conf.scan_ports).unwrap();
     let mut ftrs = FuturesUnordered::new();
     for _ in 0..conf.async_scan_limit {
         if let Some(record) = active_record_iter.next() {

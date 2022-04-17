@@ -189,7 +189,7 @@ pub fn get_config()-> (ResultConfig,Config) {
     -l,--limit         <num>              port scan limit(default from config file,max 65535).
     -P,--poc-file      <filename>         specify the POC file(default from config file).
     -e,--exclude       <files1,..>        pasive,active,urls exclude files(separated by comma).
-    --poc-exclude      <files1,..>        poc detecting exclude targets file(must be Ratel output .csv result,separated by comma).
+    --poc-exclude      <files1,..>        poc detecting exclude targets file(must be Ratel output .xlsx result,separated by comma).
     --disable-poc                         disable poc mod.
     -h,--help                             print help.")
     .arg(Arg::with_name("passive")
@@ -387,7 +387,8 @@ pub fn get_config()-> (ResultConfig,Config) {
         all.push(s.to_string());
     } else if let Some(s) = app_matches.value_of("targets") {
         active = true;
-        all.push(s.to_string());
+        let mut tmp = s.split(",").map(|s|s.to_string()).collect::<Vec<String>>();
+        all.append(&mut tmp);
     };
 
     let domain_regex = Regex::new("^(?:[a-zA-Z0-9][-a-zA-Z0-9]{0,62}\\.)+[a-zA-Z]+$").unwrap();
