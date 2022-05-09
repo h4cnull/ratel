@@ -43,6 +43,7 @@
           "path_args": "/$HOST$"
         },
         {
+          "delay":1500,
           "path_args": "/test.txt",
           "variables_regex": "token=\"(.*?)\" id=\"(.*?)\".*?(regex2)",
           "regex_dot_all": true,

@@ -1,4 +1,8 @@
 ### 更新说明
+版本2.0.2
+```text
+1.支持设置poc请求延迟时间。
+```
 
 版本2.0.1
 ```text
@@ -44,6 +48,7 @@ ratel的输出是csv格式，所有和输入域名、IP相同的资产其is_asse
           "path_args": "/$HOST$"     //请求路径和参数，非必须，默认 /，$HOST$是特殊变量，值为当前请求的host(ip或域名)。使用该变量方便进行大量OOB测试时区分漏洞主机。
         },
         {
+    "delay":1500,              //延迟1500毫秒请求
 	  "method":"GET",            //请求方法，非必须，默认 GET，还支持POST HEAD DELETE PATCH OPTIONS TRACE方法
           "path_args": "/test.txt",
           "variables_regex": "token=\"(.*?)\" id=\"(.*?)\".*?(regex2)",  //匹配响应内容的正则表达式

@@ -47,7 +47,8 @@ pub struct PocRequest {
     pub variables_regex:Option<String>,
     pub regex_dot_all:Option<bool>,   //default false
     pub variables_group:Option<Vec<(String,usize)>>,
-    pub rules:Option<PocRules>
+    pub rules:Option<PocRules>,
+    pub delay:Option<usize>
 }
 
 #[derive(Debug,Deserialize)]
@@ -360,6 +361,10 @@ impl Detector {
         for poc_req in poc.requests.iter() {
             let return_data = poc_req.variables_regex.is_some() && poc_req.variables_group.is_some();
             //println!("need return data {}",return_data); ///////////////////////
+            let delay = poc_req.delay.unwrap_or(0);  // millisecond
+            if delay != 0 {
+                async_std::task::sleep(Duration::from_millis(delay as u64)).await;
+            };
             if let Some(data) = self.poc_request(protocol,host,port,poc_req, root_status_code, root_header, root_body, favicon_hash,&replace_v,return_data).await {
                 //println!("return data {:?}",data);       /////////////////////////////////////////////
                 if let Some(data) = data {  //return_data is true
