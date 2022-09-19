@@ -1,11 +1,8 @@
 use std::collections::HashMap;
-use std::time::Duration;
-use std::io::Cursor;
+use std::time::{Duration, Instant};
 use regex::{Regex,RegexBuilder};
 use futures::StreamExt;
 use futures::stream::FuturesUnordered;
-use base64;
-use murmur3::murmur3_32;
 use serde::Deserialize;
 use super::RecordType;
 use super::http_banner::*;
@@ -17,7 +14,7 @@ pub struct Detector {
     icon_regex: Regex,
     icon_href_regex: Regex,
     title_regex: Regex,
-    conn_timeout: Duration,
+    http_client: HttpClient,
     http_timeout: Duration,
     follow_redirect: bool,
     per_url_limit: u16,
@@ -67,6 +64,14 @@ enum Rules<'a> {
     Favicon(i32)
 }
 
+struct HttpCheckRst {
+    status_code: u16,
+    raw_header: Vec<u8>,
+    raw_body: Vec<u8>,
+    cert_domains: Vec<String>,
+    current_url: HttpUrl
+}
+
 static MAX_REDIRECT_NUM:usize = 5;
 
 impl Detector {
@@ -90,12 +95,15 @@ impl Detector {
         let icon_href_regex = Regex::new("href=\"?(.*?)[\" >]").unwrap();
         let title_regex = Regex::new("<(?:title|TITLE)>(.*?)</(?:title|TITLE)>").unwrap();
         //let x_powered_by = Regex::new("X-Powered-By: (.*)?\r\n")?;
+        let mut http_client = HttpClient::default();
+        let http_timeout = Duration::from_secs(conf.http_timeout);
+        http_client.set_http_timeout(http_timeout);
         return Detector {
             server_regex,
             icon_regex,
             icon_href_regex,
             title_regex,
-            conn_timeout: Duration::from_millis(conf.conn_timeout),
+            http_client,
             http_timeout: Duration::from_secs(conf.http_timeout),
             follow_redirect: conf.follow_redirect,
             per_url_limit: conf.per_url_limit,
@@ -105,46 +113,48 @@ impl Detector {
         };
     }
 
-    async fn http_init(&self,protocol:&str,host:&str,port:u16)-> (u16,Vec<u8>,Vec<u8>,HttpUrl) {
-        
+    async fn http_check(&self,service:&str,host:&str,port:u16)-> HttpCheckRst {
         let mut code = 0;
         let mut raw_header = Vec::new();
-        let mut body = Vec::new();
-        
-        let mut current_url = HttpUrl::new(format!("{}://{}:{}/",protocol,host,port)).unwrap();
-        let mut next_url:Option<HttpUrl> = None;
-        
+        let mut raw_body = Vec::new();
+        let mut cert_domains = vec![];
+        let url = format!("{}://{}:{}/",service,host,port);
+        //let r = self.http_client.get(url);
+        //if r.is_err() {
+        //    log::error!("{}",format!("{}://{}:{}/",service,host,port));
+        //}
+        //let mut req = r.unwrap();
+        let mut req = self.http_client.get(url).unwrap();
+        let mut next_url:Option<String> = None;
+        let start = Instant::now();
         for _ in 0..MAX_REDIRECT_NUM {
-            let req = if next_url.is_some() {
+            //println!("{}",String::from_utf8_lossy(&body));
+            if next_url.is_some() {
                 let n_url = next_url.as_ref().unwrap();
-                let tmp_host = n_url.host();
-                let tmp_port = n_url.port();
-                let tmp_path = n_url.path_args();
-                fmt_req(&tmp_host, tmp_port, "GET", &tmp_path,Vec::new(),None)
-            } else {
-                fmt_req(host, port, "GET", "/",Vec::new(),None)
-            };
-            //println!("current url {:?},next_url {:?}",current_url,next_url);   ///////////
-            if let Ok(rst) = http_cli(protocol, host, port, req,self.conn_timeout, self.http_timeout).await {
-                if next_url.is_some() {
-                    current_url = next_url.take().unwrap();
-                };
-                code = rst.0;
-                raw_header = rst.2;
-                body = rst.3;
-                //println!("{}",String::from_utf8_lossy(&body));
-                if self.follow_redirect && (300..400).contains(&rst.0) {
-                    if let Some(u) = rst.1 {
+                if let Ok(tmp) = self.http_client.get(n_url.as_str().to_string()) {
+                    req = tmp;
+                } else {
+                    break;
+                }
+            }
+            let rst = req.send().await;
+            if let Ok(rst) = rst {
+                code = rst.status_code;
+                raw_header = rst.raw_header;
+                raw_body = rst.raw_body;
+                if cert_domains.len() == 0 && rst.cert.is_some() {
+                    if let Ok(tmp) = cert_parser(rst.cert.unwrap()) {
+                        cert_domains = tmp;
+                    };
+                }
+                if self.follow_redirect && (300..400).contains(&rst.status_code) {
+                    if let Some(u) = rst.location {
                         if u.starts_with("/") {
-                            next_url = Some(HttpUrl::new(format!("{}://{}:{}{}",current_url.protocol(),current_url.host(),current_url.port(),u)).unwrap());
-                        } else if u.starts_with("http:") || u.starts_with("https") {
-                            if let Some(u) = HttpUrl::new(u) {
-                                next_url = Some(u);
-                            } else {
-                                break;
-                            }
+                            next_url = Some(format!("{}://{}:{}{}",req.url.scheme(),req.url.host(),req.url.port(),u));
+                        } else if u.starts_with("http:") || u.starts_with("https:") {
+                            next_url = Some(u);
                         } else {
-                            next_url = Some(HttpUrl::new(format!("{}{}",current_url.url_with_path(),u)).unwrap());
+                            next_url = Some(format!("{}{}",req.url.url_with_path(),u));
                         }
                     } else {
                         break;
@@ -155,8 +165,13 @@ impl Detector {
             } else {
                 break;
             }
+            let used = Instant::now() - start;
+            if used >= self.http_timeout {
+                break;
+            }
         }
-        return (code,raw_header,body,current_url);  //end with /
+        let current_url = req.url;
+        return HttpCheckRst { status_code:code,raw_header,raw_body,current_url,cert_domains };  //end with /
     }
 
     pub async fn detect(&self,mut record:Box<dyn Record>) -> Option<Data> {
@@ -187,28 +202,29 @@ impl Detector {
         if record.record_type() == RecordType::Active {
             //如果是主动扫描结果，尝试将端口视为https http协议处理
             if data.port == 80 || data.port != 443 {
-                let (code,header,body,url) = self.http_init("http", &data.host, data.port).await; 
-                if code > 0 {
+                let check_rst = self.http_check("http", &data.host, data.port).await; 
+                if check_rst.status_code > 0 {
                     data.protocol = "http".to_string();
                     data.url = Some(format!("http://{}:{}",data.host,data.port));
-                    data.status_code = code;
-                    root_header_cache = header;
-                    root_body_cache = body;
-                    current_url_path = Some(url);
+                    data.status_code = check_rst.status_code;
+                    root_header_cache = check_rst.raw_header;
+                    root_body_cache = check_rst.raw_body;
+                    current_url_path = Some(check_rst.current_url);
                 } else if data.port == 80 {
                     data.protocol = "http".to_string();
                     data.url = Some(format!("http://{}:{}",data.host,data.port));
                 }
             }
             if data.port != 80 && data.protocol == "" {
-                let (code,header,body,url) = self.http_init("https", &data.host, data.port).await; 
-                if code > 0 {
+                let mut check_rst = self.http_check("https", &data.host, data.port).await;
+                if check_rst.status_code > 0 {
                     data.protocol = "https".to_string();
                     data.url = Some(format!("https://{}:{}",data.host,data.port));
-                    data.status_code = code;
-                    root_header_cache = header;
-                    root_body_cache = body;
-                    current_url_path = Some(url);
+                    data.status_code = check_rst.status_code;
+                    root_header_cache = check_rst.raw_header;
+                    root_body_cache = check_rst.raw_body;
+                    current_url_path = Some(check_rst.current_url);
+                    data.cert_domains.append(&mut check_rst.cert_domains);
                 } else if data.port == 443 {
                     data.protocol = "https".to_string();
                     data.url = Some(format!("https://{}:{}",data.host,data.port));
@@ -217,12 +233,13 @@ impl Detector {
         } else {
             if data.protocol == "http" || data.protocol == "https" {
                 data.url = Some(format!("{}://{}:{}",data.protocol,data.host,data.port));
-                let (code,header,body,url) = self.http_init(&data.protocol, &data.host, data.port).await;
-                if code > 0 {
-                    data.status_code = code;
-                    root_header_cache = header;
-                    root_body_cache = body;
-                    current_url_path = Some(url);
+                let mut check_rst = self.http_check(&data.protocol, &data.host, data.port).await;
+                if check_rst.status_code > 0 {
+                    data.status_code = check_rst.status_code;
+                    root_header_cache = check_rst.raw_header;
+                    root_body_cache = check_rst.raw_body;
+                    current_url_path = Some(check_rst.current_url);
+                    data.cert_domains.append(&mut check_rst.cert_domains);
                 }
             }
         }
@@ -230,20 +247,6 @@ impl Detector {
         let mut infos = Vec::new();
         let mut level = 0;
         if data.status_code > 0 {
-            if data.protocol == "https" {
-                if let Ok(cert) = https_cert(&data.host, data.port, self.conn_timeout, self.http_timeout).await {
-                    if let Some(cert) = cert {
-                        if let Ok(mut domains) = cert_parser(cert) {
-                            for _ in 0..domains.len() {
-                                let d = domains.pop().unwrap();
-                                if !data.cert_domains.contains(&d) {
-                                    data.cert_domains.push(d);
-                                }
-                            }
-                        };
-                    }
-                }
-            }
             //println!("{:?}",current_url_path);
             //如果发生了重定向，url就不是根了，从重定向后的页面获取favicon地址，如果是../开头的相对地址，就需要当前url来定位favicon地址
             //如果前面http请求成功了，再继续
@@ -322,7 +325,7 @@ impl Detector {
                     //计算favicon hash!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     /////println!("favicon url {:?}",favicon_url);
                     if favicon_url.is_some() {
-                        favicon_hash = self.favicon_hash(favicon_url.unwrap()).await;
+                        favicon_hash = http_favicon_hash(favicon_url.unwrap(),self.http_timeout).await;
                         data.favicon = favicon_hash;
                     }
                 }
@@ -407,8 +410,8 @@ impl Detector {
         return Some((name.to_string(),level));
     }
     
-    async fn poc_request(&self,protocol:&str,host:&str,port:u16,poc_req:&PocRequest,root_status_code:u16,root_header:&str,root_body:&str,favicon_hash:Option<i32>,replace_variables:&Option<HashMap<&str,String>>,return_data:bool) -> Option<Option<String>> {
-        let mut need_true = Vec::new();
+    async fn poc_request(&self,service:&str,host:&str,port:u16,poc_req:&PocRequest,root_status_code:u16,root_header:&str,root_body:&str,favicon_hash:Option<i32>,replace_variables:&Option<HashMap<&str,String>>,return_data:bool) -> Option<Option<String>> {
+        let mut need_true = Vec::with_capacity(4);
         if poc_req.rules.is_some() {
             let rules = poc_req.rules.as_ref().unwrap();
             if let Some(status_code) = rules.status_code {
@@ -461,187 +464,210 @@ impl Detector {
             };
             match method {
                 "GET" => {
-                    let req = fmt_req(host, port, method, path_args, headers, None);
-                    let mut req = req.replace("$HOST$", host);
+                    let url = format!("{}://{}:{}{}",service,host,port,path_args);
+                    let mut req = self.http_client.get(url).unwrap();
+                    req.set_headers(headers);
+                    let mut raw_req = req.fmt_req();
+                    raw_req = raw_req.replace("$HOST$", host);
                     if replace_variables.is_some() {
                         let reps = replace_variables.as_ref().unwrap();
                         for (from,to) in reps {
-                            req = req.replace(from, to);
+                            raw_req = raw_req.replace(from, to);
                         }
                     }
-                    //println!("{}",req);   ////////////////////////////
-                    let rsp = http_cli(protocol, host, port, req, self.conn_timeout, self.http_timeout).await;
-                    //let rsp = req.send().await;
+                    let rsp = req.send_req(raw_req).await;
                     if let Ok(r) = rsp {
-                        status_code = r.0;
-                        match_header_not_root_cache = r.2;
-                        match_body_not_root_cache = r.3;
+                        status_code = r.status_code;
+                        match_header_not_root_cache = r.raw_header;
+                        match_body_not_root_cache = r.raw_body;
                         match_header_not_root = String::from_utf8_lossy(&match_header_not_root_cache);
                         match_body_not_root = String::from_utf8_lossy(&match_body_not_root_cache);
                     };
                 },
                 "POST" => {
+                    let url = format!("{}://{}:{}{}",service,host,port,path_args);
+                    //需要先替换body的变量, 创建RawRequest时计算Content-Length
                     let req_body = poc_req.req_body.as_ref();
-                    let req = if req_body.is_some() {
-                        let mut req_body = req_body.unwrap().clone(); 
-                        req_body = req_body.replace("$HOST$", host);
+                    let mut req_body_str:String;
+                    let mut req = if req_body.is_some() {
+                        req_body_str = req_body.unwrap().replace("$HOST$", host); 
                         if replace_variables.is_some() {
                             let reps = replace_variables.as_ref().unwrap();
                             for (from,to) in reps {
-                                req_body = req_body.replace(from, to);
+                                req_body_str = req_body_str.replace(from, to);
                             }
                         }
-                        fmt_req(host, port, method, path_args, headers, Some(&req_body))
+                        self.http_client.request(HTTPMethod::POST,url,Some(&req_body_str)).unwrap()
                     } else {
-                        fmt_req(host, port, method, path_args, headers, None)
+                        self.http_client.request(HTTPMethod::POST,url,None).unwrap()
                     };
-                    let mut req = req.replace("$HOST$", host);
+                    //如果指定的headers中包含了host,user-agnet,connection,content-length,则会替换为指定的值
+                    req.set_headers(headers);
+                    let mut raw_req = req.fmt_req();
+                    raw_req = raw_req.replace("$HOST$", host);
                     if replace_variables.is_some() {
                         let reps = replace_variables.as_ref().unwrap();
                         for (from,to) in reps {
-                            req = req.replace(from, to);
+                            raw_req = raw_req.replace(from, to);
                         }
                     }
-                    //println!("{}",req);   ////////////////////////////
-                    let rsp = http_cli(protocol, host, port, req, self.conn_timeout, self.http_timeout).await;
+                    let rsp = req.send_req(raw_req).await;
                     if let Ok(r) = rsp {
-                        status_code = r.0;
-                        match_header_not_root_cache = r.2;
-                        match_body_not_root_cache = r.3;
+                        status_code = r.status_code;
+                        match_header_not_root_cache = r.raw_header;
+                        match_body_not_root_cache = r.raw_body;
                         match_header_not_root = String::from_utf8_lossy(&match_header_not_root_cache);
                         match_body_not_root = String::from_utf8_lossy(&match_body_not_root_cache);
                     };
                 },
                 "HEAD" => {
-                    let req = fmt_req(host, port, method, path_args, headers, None);
-                    let mut req = req.replace("$HOST$", host);
+                    let url = format!("{}://{}:{}{}",service,host,port,path_args);
+                    let mut req = self.http_client.request(HTTPMethod::HEAD,url,None).unwrap();
+                    req.set_headers(headers);
+                    let mut raw_req = req.fmt_req();
+                    raw_req = raw_req.replace("$HOST$", host);
                     if replace_variables.is_some() {
                         let reps = replace_variables.as_ref().unwrap();
                         for (from,to) in reps {
-                            req = req.replace(from, to);
+                            raw_req = raw_req.replace(from, to);
                         }
                     }
-                    let rsp = http_cli(protocol, host, port, req, self.conn_timeout, self.http_timeout).await;
+                    let rsp = req.send_req(raw_req).await;
                     if let Ok(r) = rsp {
-                        status_code = r.0;
-                        match_header_not_root_cache = r.2;
-                        match_body_not_root_cache = r.3;
+                        status_code = r.status_code;
+                        match_header_not_root_cache = r.raw_header;
+                        match_body_not_root_cache = r.raw_body;
                         match_header_not_root = String::from_utf8_lossy(&match_header_not_root_cache);
                         match_body_not_root = String::from_utf8_lossy(&match_body_not_root_cache);
                     };
                 },
                 "PUT" => {
+                    let url = format!("{}://{}:{}{}",service,host,port,path_args);
                     let req_body = poc_req.req_body.as_ref();
-                    let req = if req_body.is_some() {
-                        let mut req_body = req_body.unwrap().clone(); 
-                        req_body = req_body.replace("$HOST$", host);
+                    let mut req_body_str:String;
+                    let mut req = if req_body.is_some() {
+                        req_body_str = req_body.unwrap().replace("$HOST$", host);
                         if replace_variables.is_some() {
                             let reps = replace_variables.as_ref().unwrap();
                             for (from,to) in reps {
-                                req_body = req_body.replace(from, to);
+                                req_body_str = req_body_str.replace(from, to);
                             }
                         }
-                        fmt_req(host, port, method, path_args, headers, Some(&req_body))
+                        self.http_client.request(HTTPMethod::PUT,url,Some(&req_body_str)).unwrap()
                     } else {
-                        fmt_req(host, port, method, path_args, headers, None)
+                        self.http_client.request(HTTPMethod::PUT,url,None).unwrap()
                     };
-                    let mut req = req.replace("$HOST$", host);
+                    req.set_headers(headers);
+                    let mut raw_req = req.fmt_req();
+                    raw_req = raw_req.replace("$HOST$", host);
                     if replace_variables.is_some() {
                         let reps = replace_variables.as_ref().unwrap();
                         for (from,to) in reps {
-                            req = req.replace(from, to);
+                            raw_req = raw_req.replace(from, to);
                         }
                     }
-                    let rsp = http_cli(protocol, host, port, req, self.conn_timeout, self.http_timeout).await;
+                    let rsp = req.send_req(raw_req).await;
                     if let Ok(r) = rsp {
-                        status_code = r.0;
-                        match_header_not_root_cache = r.2;
-                        match_body_not_root_cache = r.3;
+                        status_code = r.status_code;
+                        match_header_not_root_cache = r.raw_header;
+                        match_body_not_root_cache = r.raw_body;
                         match_header_not_root = String::from_utf8_lossy(&match_header_not_root_cache);
                         match_body_not_root = String::from_utf8_lossy(&match_body_not_root_cache);
                     };
                 }
                 "DELETE" => {
-                    let req = fmt_req(host, port, method, path_args, headers, None);
-                    let mut req = req.replace("$HOST$", host);
+                    let url = format!("{}://{}:{}{}",service,host,port,path_args);
+                    let mut req = self.http_client.request(HTTPMethod::DELETE,url,None).unwrap();
+                    req.set_headers(headers);
+                    let mut raw_req = req.fmt_req();
+                    raw_req = raw_req.replace("$HOST$", host);
                     if replace_variables.is_some() {
                         let reps = replace_variables.as_ref().unwrap();
                         for (from,to) in reps {
-                            req = req.replace(from, to);
+                            raw_req = raw_req.replace(from, to);
                         }
                     }
-                    let rsp = http_cli(protocol, host, port, req, self.conn_timeout, self.http_timeout).await;
+                    let rsp = req.send_req(raw_req).await;
                     if let Ok(r) = rsp {
-                        status_code = r.0;
-                        match_header_not_root_cache = r.2;
-                        match_body_not_root_cache = r.3;
+                        status_code = r.status_code;
+                        match_header_not_root_cache = r.raw_header;
+                        match_body_not_root_cache = r.raw_body;
                         match_header_not_root = String::from_utf8_lossy(&match_header_not_root_cache);
                         match_body_not_root = String::from_utf8_lossy(&match_body_not_root_cache);
                     };
                 }
                 "PATCH" => {
+                    let url = format!("{}://{}:{}{}",service,host,port,path_args);
                     let req_body = poc_req.req_body.as_ref();
-                    let req = if req_body.is_some() {
-                        let mut req_body = req_body.unwrap().clone(); 
-                        req_body = req_body.replace("$HOST$", host);
+                    let mut req_body_str:String;
+                    let mut req = if req_body.is_some() {
+                        req_body_str = req_body.unwrap().replace("$HOST$", host);
                         if replace_variables.is_some() {
                             let reps = replace_variables.as_ref().unwrap();
                             for (from,to) in reps {
-                                req_body = req_body.replace(from, to);
+                                req_body_str = req_body_str.replace(from, to);
                             }
                         }
-                        fmt_req(host, port, method, path_args, headers, Some(&req_body))
+                        self.http_client.request(HTTPMethod::PATCH,url,Some(&req_body_str)).unwrap()
                     } else {
-                        fmt_req(host, port, method, path_args, headers, None)
+                        self.http_client.request(HTTPMethod::PATCH,url,None).unwrap()
                     };
-                    let mut req = req.replace("$HOST$", host);
+                    req.set_headers(headers);
+                    let mut raw_req = req.fmt_req();
+                    raw_req = raw_req.replace("$HOST$", host);
                     if replace_variables.is_some() {
                         let reps = replace_variables.as_ref().unwrap();
                         for (from,to) in reps {
-                            req = req.replace(from, to);
+                            raw_req = raw_req.replace(from, to);
                         }
                     }
-                    let rsp = http_cli(protocol, host, port, req, self.conn_timeout, self.http_timeout).await;
+                    let rsp = req.send_req(raw_req).await;
                     if let Ok(r) = rsp {
-                        status_code = r.0;
-                        match_header_not_root_cache = r.2;
-                        match_body_not_root_cache = r.3;
+                        status_code = r.status_code;
+                        match_header_not_root_cache = r.raw_header;
+                        match_body_not_root_cache = r.raw_body;
                         match_header_not_root = String::from_utf8_lossy(&match_header_not_root_cache);
                         match_body_not_root = String::from_utf8_lossy(&match_body_not_root_cache);
                     };
                 }
                 "OPTIONS" => {
-                    let req = fmt_req(host, port, method, path_args, headers, None);
-                    let mut req = req.replace("$HOST$", host);
+                    let url = format!("{}://{}:{}{}",service,host,port,path_args);
+                    let mut req = self.http_client.request(HTTPMethod::OPTIONS,url,None).unwrap();
+                    let mut raw_req = req.fmt_req();
+                    req.set_headers(headers);
+                    raw_req = raw_req.replace("$HOST$", host);
                     if replace_variables.is_some() {
                         let reps = replace_variables.as_ref().unwrap();
                         for (from,to) in reps {
-                            req = req.replace(from, to);
+                            raw_req = raw_req.replace(from, to);
                         }
                     }
-                    let rsp = http_cli(protocol, host, port, req, self.conn_timeout, self.http_timeout).await;
+                    let rsp = req.send_req(raw_req).await;
                     if let Ok(r) = rsp {
-                        status_code = r.0;
-                        match_header_not_root_cache = r.2;
-                        match_body_not_root_cache = r.3;
+                        status_code = r.status_code;
+                        match_header_not_root_cache = r.raw_header;
+                        match_body_not_root_cache = r.raw_body;
                         match_header_not_root = String::from_utf8_lossy(&match_header_not_root_cache);
                         match_body_not_root = String::from_utf8_lossy(&match_body_not_root_cache);
                     };
                 },
                 "TRACE" => {
-                    let req = fmt_req(host, port, method, path_args, headers, None);
-                    let mut req = req.replace("$HOST$", host);
+                    let url = format!("{}://{}:{}{}",service,host,port,path_args);
+                    let mut req = self.http_client.request(HTTPMethod::TRACE,url,None).unwrap();
+                    req.set_headers(headers);
+                    let mut raw_req = req.fmt_req();
+                    raw_req = raw_req.replace("$HOST$", host);
                     if replace_variables.is_some() {
                         let reps = replace_variables.as_ref().unwrap();
                         for (from,to) in reps {
-                            req = req.replace(from, to);
+                            raw_req = raw_req.replace(from, to);
                         }
                     }
-                    let rsp = http_cli(protocol, host, port, req, self.conn_timeout, self.http_timeout).await;
+                    let rsp = req.send_req(raw_req).await;
                     if let Ok(r) = rsp {
-                        status_code = r.0;
-                        match_header_not_root_cache = r.2;
-                        match_body_not_root_cache = r.3;
+                        status_code = r.status_code;
+                        match_header_not_root_cache = r.raw_header;
+                        match_body_not_root_cache = r.raw_body;
                         match_header_not_root = String::from_utf8_lossy(&match_header_not_root_cache);
                         match_body_not_root = String::from_utf8_lossy(&match_body_not_root_cache);
                     };
@@ -704,36 +730,5 @@ impl Detector {
         } else {
             return None;
         }
-    }
-
-    async fn favicon_hash(&self,url:String) -> Option<i32> {
-        let url = HttpUrl::new(url).unwrap();
-        let host = url.host();
-        let port = url.port();
-        let path = url.path_args();
-        let req = fmt_req(host, port, "GET", path, Vec::new(), None);
-        let mut favicon_hash = None;
-        if let Ok(rsp) = http_cli(url.protocol(), host,port, req, self.conn_timeout, self.http_timeout).await {
-            if rsp.0 == 200 {
-                let mut base64_buf = String::new();
-                base64::encode_config_buf(rsp.3, base64::STANDARD, &mut base64_buf);
-                let base64_buf = base64_buf.as_bytes();
-                //给base64按照标准加上'\n' 标准参考python的base64.encodebytes()
-                let mut base64_buf_pad_n = vec![];
-                for i in 0..base64_buf.len() {
-                    if i !=0 && i % 76 == 0{
-                        base64_buf_pad_n.push(b'\n');
-                    }
-                    base64_buf_pad_n.push(base64_buf[i]);
-                }
-                if Some(&b'\n') != base64_buf_pad_n.last() {  //最后一个元素加上\n
-                    base64_buf_pad_n.push(b'\n');
-                }
-                //println!("base64 favicon bytes len: {}",base64_buf_pad_n.len());
-                let mut cur = Cursor::new(&base64_buf_pad_n);
-                favicon_hash = Some(murmur3_32(&mut cur, 0).unwrap() as i32);
-            }
-        };
-        return favicon_hash;
     }
 }

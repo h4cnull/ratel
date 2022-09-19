@@ -236,6 +236,9 @@ pub fn fofa_search(run_mod:PassiveMod,searchs:Arc<Vec<String>>,fofa_sender:SyncS
                             //break;
                             let mut protocol = r.pop().unwrap();
                             let port = r.pop().unwrap().parse::<u16>().unwrap_or_else(|_|{0});
+                            if port == 0 {
+                                continue;
+                            }
                             let title = r.pop().unwrap();
                             let host = r.pop().unwrap();
                             if host.starts_with("http://") {
@@ -468,6 +471,9 @@ pub fn zoomeye_search(run_mod:PassiveMod,searchs:Arc<Vec<String>>,zoomeye_sender
                                     (0,format!("zoomeye freak \"protinfo\" result, at {}:\n{}",ip,content),"".to_string())
                                 }
                             };
+                            if port == 0 {
+                                continue;
+                            }
                             let mut cert_domains = Vec::new();
                             if let Some(ssl) = v.get("ssl") {
                                 let ssl = ssl.as_str().unwrap();

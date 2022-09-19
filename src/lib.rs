@@ -4,7 +4,7 @@ use std::process::exit;
 
 use regex::Regex;
 use serde::Deserialize;
-use chrono::prelude::*;
+use chrono::{prelude::*, format::format};
 use rand::prelude::*;
 use clap::{App, AppSettings, Arg, ErrorKind};
 
@@ -187,6 +187,8 @@ pub fn get_config()-> (ResultConfig,Config) {
     -o,--output        <filename>         output filename prefix(default current time + random chars,result contains xxx_result.xlsx or xxx_result_notice.txt(for recovery)).
     -p,--ports         <ports>            specify active scan ports(etc:80-100,443, default from config file).
     -l,--limit         <num>              port scan limit(default from config file,max 65535).
+       --timeout       <num>              port scan timeout(millisecond,default from config file).
+       --retry         <num>              port scan retry(default from config file).
     -P,--poc-file      <filename>         specify the POC file(default from config file).
     -e,--exclude       <files1,..>        pasive,active,urls exclude files(separated by comma).
     --poc-exclude      <files1,..>        poc detecting exclude targets file(must be Ratel output .xlsx result,separated by comma).
@@ -199,6 +201,8 @@ pub fn get_config()-> (ResultConfig,Config) {
         .conflicts_with("recovery")
         .conflicts_with("ports")
         .conflicts_with("limit")
+        .conflicts_with("timeout")
+        .conflicts_with("retry")
         .takes_value(false)
         .long("passive")
     )
@@ -216,6 +220,8 @@ pub fn get_config()-> (ResultConfig,Config) {
         .conflicts_with("search_string")  //search_string 配合的passive参数
         .conflicts_with("ports")
         .conflicts_with("limit")
+        .conflicts_with("timeout")
+        .conflicts_with("retry")
         .takes_value(false)
         .long("urls"))
     .arg(Arg::with_name("recovery")
@@ -225,6 +231,8 @@ pub fn get_config()-> (ResultConfig,Config) {
         .conflicts_with("search_string")
         .conflicts_with("ports")
         .conflicts_with("limit")
+        .conflicts_with("timeout")
+        .conflicts_with("retry")
         .takes_value(false)
         .long("recovery")
     )
@@ -233,6 +241,10 @@ pub fn get_config()-> (ResultConfig,Config) {
         .long("string")
         .takes_value(true)
         .conflicts_with("targets")
+        .conflicts_with("ports")
+        .conflicts_with("limit")
+        .conflicts_with("timeout")
+        .conflicts_with("retry")
         .conflicts_with("stdin"))
     .arg(Arg::with_name("targets")
         .short("t")
@@ -260,6 +272,12 @@ pub fn get_config()-> (ResultConfig,Config) {
         .short("l")
         .long("limit")
         .takes_value(true))
+    .arg(Arg::with_name("timeout")
+        .long("timeout")
+        .takes_value(true))
+    .arg(Arg::with_name("retry")
+        .long("retry")
+        .takes_value(true))
     .arg(Arg::with_name("pocs_file")
         .short("P")
         .long("poc-file")
@@ -280,6 +298,8 @@ pub fn get_config()-> (ResultConfig,Config) {
         .conflicts_with("targets")        //targets  配合active参数
         .conflicts_with("ports")
         .conflicts_with("limit")
+        .conflicts_with("timeout")
+        .conflicts_with("retry")
         .conflicts_with("urls")
         .long("fofa-size")
         .takes_value(true));
@@ -307,16 +327,6 @@ pub fn get_config()-> (ResultConfig,Config) {
         }
         exit(-1);        
     });
-    let async_scan_limit = if let Some(l) = app_matches.value_of("limit") {
-        if let Ok(n) = l.parse::<u16>() {
-            Some(n)
-        } else {
-            println!("argument need a number value, max 65535. \"-h\" print help.");
-            exit(-1);
-        }
-    } else {
-        None
-    };
     let exclude_files = if let Some(ef) =  app_matches.value_of("exclude_files") {
         ef.split(',').map(|s|{s.to_string()}).collect::<Vec<String>>()
     } else {
@@ -328,13 +338,15 @@ pub fn get_config()-> (ResultConfig,Config) {
     } else {
         vec![]
     };
-
     let disable_poc = app_matches.is_present("disable_poc");
-    let s = fs::read_to_string(CONFIG_FILE).unwrap_or_else(|e| {
+    let mut self_file_name = std::env::current_exe().unwrap();
+    self_file_name.set_file_name(CONFIG_FILE);
+    let conf_file = self_file_name.to_str().unwrap();
+    let s = fs::read_to_string(conf_file).unwrap_or_else(|e| {
         match e.kind() {
             std::io::ErrorKind::NotFound => {
-                println!("[-] Not found config file \"{}\",ratel will creating it,using defalut config...",CONFIG_FILE);
-                fs::write(CONFIG_FILE,CONFIG_TOML).unwrap_or_else(|e|{
+                println!("[-] Not found config file \"{}\",ratel will creating it,using defalut config...",conf_file);
+                fs::write(conf_file,CONFIG_TOML).unwrap_or_else(|e|{
                     println!("[-] Can not create config file: {:?}",e.kind());
                 });
             },
@@ -348,7 +360,36 @@ pub fn get_config()-> (ResultConfig,Config) {
         println!("[!] Parse onfig file \"{}\" error: {}",CONFIG_FILE,e.to_string());
         exit(-1);
     });
-
+    let async_scan_limit = if let Some(l) = app_matches.value_of("limit") {
+        if let Ok(n) = l.parse::<u16>() {
+            n
+        } else {
+            println!("argument need a number value, max 65535. \"-h\" print help.");
+            exit(-1);
+        }
+    } else {
+        toml_conf.async_scan_limit
+    };
+    let conn_timeout = if let Some(l) = app_matches.value_of("timeout") {
+        if let Ok(n) = l.parse::<u64>() {
+            n
+        } else {
+            println!("argument need a number value. \"-h\" print help.");
+            exit(-1);
+        }
+    } else {
+        toml_conf.conn_timeout
+    };
+    let conn_retries = if let Some(l) = app_matches.value_of("retry") {
+        if let Ok(n) = l.parse::<u8>() {
+            n
+        } else {
+            println!("argument need a number value, max 255. \"-h\" print help.");
+            exit(-1);
+        }
+    } else {
+        toml_conf.conn_retries
+    };
     let now = Local::now();
     let output_file_name = if let Some(fname) =  app_matches.value_of("output") {
         if std::path::Path::new(&format!("{}_results.csv",fname)).exists() {
@@ -424,8 +465,8 @@ pub fn get_config()-> (ResultConfig,Config) {
 
     let rst_config = ResultConfig {
         pocs_file,
-        conn_timeout: toml_conf.conn_timeout,
-        conn_retries: toml_conf.conn_retries,
+        conn_timeout,
+        conn_retries,
         http_timeout: toml_conf.http_timeout,
         follow_redirect: toml_conf.follow_redirect,
         poc_exclude_files,
@@ -492,10 +533,10 @@ pub fn get_config()-> (ResultConfig,Config) {
         return (rst_config,Config::Active(ActiveConfig{
                 targets: all,
                 exclude_files,
-                async_scan_limit:async_scan_limit.unwrap_or(toml_conf.async_scan_limit),
+                async_scan_limit,
                 scan_ports,
-                conn_timeout: toml_conf.conn_timeout,
-                conn_retries: toml_conf.conn_retries
+                conn_timeout,
+                conn_retries
         }));
     } else if app_matches.is_present("urls") {
         return (rst_config,Config::Urls(UrlsConfig {
@@ -552,7 +593,7 @@ mod tests {
     use std::{time::Duration, sync::Arc};
     use async_std::prelude::StreamExt;
     use regex::{Regex, internal::Input};
-    use super::http_banner::{http_cli};
+    use super::http_banner::*;
     //#[test]
     fn fofa_zoomeye() {
         /*
@@ -607,46 +648,6 @@ mod tests {
         println!("fofa {} {}",s10,fofa_regex.is_match(s10));
         println!("zoomeye {} {}",s10,zoomeye_regex.is_match(s10));
     }
-    
-    use futures::stream::FuturesUnordered;
-
-    //#[tokio::test]
-    async fn test1() {
-        let urls = std::fs::read_to_string("testurls.txt").unwrap();
-        let urls = urls.split("\n").map(|s| { s.trim() } ).collect::<Vec<&str>>();
-        let mut urls_iter = urls.into_iter();
-        let mut ftrs = FuturesUnordered::new();
-        for i in 0..200 {
-            if let Some(u) = urls_iter.next() {
-                let tmp = u.split("://").collect::<Vec<&str>>();
-                let protocol = tmp[0];
-                let host = tmp[1].split(":").collect::<Vec<&str>>();
-                let port = host[1].parse::<u16>().unwrap();
-                let host = host[0];
-                let headers = Vec::new();
-                //headers.push(("User-Agent", USER_AGENT));
-                //headers.push(("Connection", "Close"));
-                let req = fmt_req(host,port,"GET", "/", headers, None);
-                //let req = format!("GET / HTTP/1.1\r\nHost: {}:{}\r\nUser-Agent: {}\r\nConnection: Close\r\n\r\n",host,port,USER_AGENT);
-                ftrs.push(http_cli(protocol,host, port, req, Duration::from_secs(3), Duration::from_secs(15)));
-            }
-        }
-        //async_std::task::sleep(Duration::from_secs(15)).await;
-        println!("start async task");
-        while let Some(_) = ftrs.next().await {
-            if let Some(u) = urls_iter.next() {
-                let tmp = u.split("://").collect::<Vec<&str>>();
-                let protocol = tmp[0];
-                let host = tmp[1].split(":").collect::<Vec<&str>>();
-                let port = host[1].parse::<u16>().unwrap();
-                let host = host[0];
-                let headers = Vec::new();    
-                let req = fmt_req(host,port,"GET", "/", headers, None);
-                //let req = format!("GET / HTTP/1.1\r\nHost: {}:{}\r\nUser-Agent: {}\r\nConnection: Close\r\n\r\n",host,port,USER_AGENT);
-                ftrs.push(http_cli(protocol,host, port, req, Duration::from_secs(3), Duration::from_secs(15)));
-            }
-        }
-    }
 
     use reqwest;
     //#[tokio::test]
@@ -660,7 +661,7 @@ mod tests {
         let url = "https://127.0.0.1/.././view.html?path=./test.txt";
         let httpu = HttpUrl::new(url.to_string()).unwrap();
         println!("{:?}",httpu);
-        println!("{}",httpu.protocol());
+        println!("{}",httpu.scheme());
         println!("{}",httpu.host());
         println!("{}",httpu.port());
         println!("{}",httpu.url_with_path());
